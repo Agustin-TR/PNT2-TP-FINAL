@@ -22,9 +22,6 @@
                 <li class="nav-item">
                 <RouterLink class="nav-link active" aria-current="page" to="/Login">Login</RouterLink>
                 </li>
-                <li class="nav-item">
-                <RouterLink class="nav-link active" aria-current="page" to="/Registro">Registro</RouterLink>
-                </li>
             </ul>
             </div>
         </div>

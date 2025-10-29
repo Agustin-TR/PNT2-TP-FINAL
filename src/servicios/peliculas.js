@@ -8,13 +8,13 @@ class ServicioPeliculas {
   // El constructor ahora recibe la clave de API
   constructor(apiKey) {
     if (!apiKey) {
-      throw new Error("Se requiere la clave de API de TMDB.");
+      throw new Error("Se requiere la clave de API de IMDb.");
     }
     this.#apiKey = apiKey;
   }
 
   /**
-   * Busca películas por título en TMDB.
+   * Busca películas por título en IMDb.
    * @param {string} titulo El título de la película a buscar.
    * @returns {Promise<Array<Object>>} Un array de resultados de películas.
    */
@@ -35,7 +35,7 @@ class ServicioPeliculas {
 
       const { data } = await axios.get(url, { params });
 
-      // La API de TMDB devuelve los resultados en la propiedad 'results'
+      // La API de IMDb devuelve los resultados en la propiedad 'results'
       return data.results;
     } catch (error) {
       console.error("Error al buscar películas:", error.message);

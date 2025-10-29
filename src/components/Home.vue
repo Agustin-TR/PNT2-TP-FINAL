@@ -43,7 +43,7 @@
         return {
         movies: [
             // Datos de ejemplo para la interfaz
-            { id: 1, title: 'Duna', year: 2021, posterUrl: 'https://via.placeholder.com/150x225/555/FFFFFF?text=Duna' },
+            { id: 1, title: 'Dune', year: 2021, posterUrl: 'https://via.placeholder.com/150x225/555/FFFFFF?text=Duna' },
             { id: 2, title: 'Barbie', year: 2023, posterUrl: 'https://via.placeholder.com/150x225/E04D8C/FFFFFF?text=Barbie' },
             { id: 3, title: 'Oppenheimer', year: 2023, posterUrl: 'https://via.placeholder.com/150x225/333/FFFFFF?text=Oppy' },
             { id: 4, title: 'Inception', year: 2010, posterUrl: 'https://via.placeholder.com/150x225/1A237E/FFFFFF?text=Inception' },

@@ -2,7 +2,7 @@
     <div class= "container-fluid">
         <div>
             <header>
-                <h2>PNT2 TP Integrador</h2> 
+                
             </header>
             <main>
                     <Nav />
