@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-header">
         <header>
-          <h2>TP3 de Agus Rojas</h2>
+          <h2>TP-FINAL</h2>
         </header>
       </div>
 
