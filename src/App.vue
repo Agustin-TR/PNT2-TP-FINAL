@@ -1,39 +1,33 @@
 <template>
-  <div class="container-fluid mt-3">
-    <div class="card">
-      <div class="card-header">
-        <header>
-          <h2>TP-FINAL</h2>
-        </header>
-      </div>
-
-      <div class="card-body">
-        <main>
-          <Navbar />
-
-          <RouterView />
-        </main>
-      </div>
+    <div class= "container-fluid">
+        <div>
+            <header>
+                <h2>PNT2 TP Integrador</h2> 
+            </header>
+            <main>
+                    <Nav />
+                    <RouterView />
+            </main>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
-  import Navbar from './components/Navbar.vue'
+    import Nav from './components/Nav.vue';
+    import Form from './components/Form.vue';
+    import Table from './components/Table.vue';
 
-
-  export default {
-    name: 'App',
-    components: {
-      Navbar,
-    }
-  }
-
+    export default {
+            name: 'app',
+            components: { // lista de los componentes incluidos
+                Nav,
+                Form,
+                Table,
+            }
+        }
 </script>
 
+
 <style scoped>
-.card-header {
-  background-color: green;
-  color: white;
-}
+
 </style>

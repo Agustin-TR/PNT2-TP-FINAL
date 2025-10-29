@@ -1,24 +1,20 @@
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHistory } from "vue-router";
 
-import Formulario from "./components/Formulario.vue"
-import Http from "./components/Http.vue"
+import Form from "./components/Form.vue";
+import Table from "./components/Table.vue";
 
 const routes = [
-    /* ----- definición de la ruta raíz ---- */
-    { path: '/', redirect: '/formulario'  },
-    
-    /* ---- definición de las rutas activas ---- */
-    { path: '/formulario', component: Formulario  },
-    { path: '/http', component: Http  },
+    { path: "/", redirect: "/Form" }, // Definicion de ruta root (ruta raiz)
+    { path: "/Form", component: Form },
+    { path: "/Table", component: Table },
 
-    /* ------ definición del comportamiento del rutear para rutas no existentes ----- */
-    { path: '/:pathmatch(.*)*', redirect: '/formulario' }
-]
+  //Definicion del comportamiento del router ante rutas no existentes
+    {path: "/:pathmatch", redirect: "/Form" },
+];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes 
-})
+    history: createWebHistory(), // vincula el historial de navegacion en el modo que queremos ()
+    routes: routes,
+});
 
-export default router
-
+export default router;
