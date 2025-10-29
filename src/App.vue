@@ -13,16 +13,26 @@
 </template>
 
 <script>
-    import Nav from './components/Nav.vue';
-    import Form from './components/Form.vue';
-    import Table from './components/Table.vue';
+    import Nav from "./components/Nav.vue";
+    import Home from "./components/Home.vue";
+    import Login from "./components/Login.vue";
+    import Registro from "./components/Registro.vue";
+    import Peliculas from "./components/Peliculas.vue";
+    import PeliculaDetalle from "./components/PeliculaDetalle.vue";
+    import Comparar from "./components/Comparar.vue";
+    import Favoritos from "./components/Favoritos.vue";
 
     export default {
             name: 'app',
             components: { // lista de los componentes incluidos
                 Nav,
-                Form,
-                Table,
+                Home,
+                Login,
+                Registro,
+                Peliculas,
+                PeliculaDetalle, 
+                Comparar,
+                Favoritos,
             }
         }
 </script>

@@ -1,22 +1,34 @@
 <template>
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">🏠 Inicio</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-            <RouterLink class="nav-link active" aria-current="page" to="/form">📋Form</RouterLink>
-            </li>
-            <li class="nav-item">
-            <RouterLink class="nav-link active" aria-current="page" to="/table">🔎Usuarios</RouterLink>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/Home">Home</RouterLink>
+                </li>
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/Peliculas">Peliculas</RouterLink>
+                </li>
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/PeliculaDetalle">Detalle</RouterLink>
+                </li>
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/Comparar">Comparar</RouterLink>
+                </li>
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/Favoritos">Favoritos</RouterLink>
+                </li>
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/Login">Login</RouterLink>
+                </li>
+                <li class="nav-item">
+                <RouterLink class="nav-link active" aria-current="page" to="/Registro">Registro</RouterLink>
+                </li>
+            </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 </template>
 
 <script>
@@ -24,7 +36,6 @@
         name: 'Nav',
         data() {
             return {
-
             }
         },
         methods: {

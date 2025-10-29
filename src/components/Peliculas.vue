@@ -1,7 +1,7 @@
 <template>
     <section class="containerd mt-2">
         <div class="text-start mt-2 mb-2">
-            <button class="btn btn-success" @click="obtener">Actualizar</button>
+            <button class="btn btn-success" @click="obtener">Pelic</button>
         </div>
         <div v-if="noFetch" class="alert alert-light col-8" role="alert"> {{ wText }}</div>
         <div v-else-if="errorCarga" class="alert alert-danger col-8" role="alert"> {{ aText }}</div>
