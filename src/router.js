@@ -14,7 +14,7 @@ const routes = [
     {path: "/Login", component: Login}, 
     {path: "/Registro", component: Registro},
     {path: "/Peliculas", component: Peliculas},
-    {path: "/PeliculaDetalle", component: PeliculaDetalle},
+    {path: "/PeliculaDetalle/:id", name: "PeliculaDetalle", component: PeliculaDetalle},
     {path: "/Comparar", component: Comparar},
     {path: "/Favoritos", component: Favoritos},
 
