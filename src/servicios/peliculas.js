@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// 🎬 Renombramos la clase para que sea más clara
 class ServicioPeliculas {
   #baseUrl = "https://api.themoviedb.org/3";
   #accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1NjczMjI2MGUyZGE5MGEzOGEwNzhkZDEwM2MyODRmZiIsIm5iZiI6MTc2MTgzNDI3Ni4yODEsInN1YiI6IjY5MDM3NTI0M2FjMWEzNWM4NmU5OTZkOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.1PT2L_iOfHyAHqAgk56ERvoKF0ojmKDMwr2UOIqpI-w";
@@ -29,7 +28,7 @@ class ServicioPeliculas {
       const url = `${this.#baseUrl}/search/movie`;
 
       // **1. Definimos los encabezados (headers) de la solicitud**
-      // Aquí es donde incluimos el Bearer Token para la autenticación.
+      // Aca incluimos el Bearer Token para la autenticación.
       const headers = {
         accept: "application/json",
         // El formato es 'Bearer' seguido del token
@@ -50,14 +49,13 @@ class ServicioPeliculas {
       return data.results;
     } catch (error) {
       console.error("Error al buscar películas:", error.message);
-      // Manejo de errores, puedes lanzar el error o retornar un array vacío
-      throw error;
+      // Manejo de errores
+      return [];
     }
   };
 
   /**
-   * 🌟 Nuevo método para obtener la lista de películas populares.
-   * Este es el método que faltaba y causaba el error.
+   * Obtener la lista de películas populares.
    * @returns {Promise<Array<Object>>} Un array de resultados de películas.
    */
   getPopularMovies = async () => {
@@ -84,7 +82,7 @@ class ServicioPeliculas {
     }
   };
   /**
- * ℹ️ Obtiene los detalles completos de una película por su ID.
+ * Obtiene los detalles completos de una película por su ID.
  * @param {number} id El ID de la película (de TMDB).
  * @returns {Promise<Object>} El objeto de detalle de la película.
  */
@@ -115,8 +113,7 @@ class ServicioPeliculas {
     }
   };
 
-  // Puedes agregar otros métodos como:
-  // getDetalles = async (id) => { ... }
+  //otros métodos:
 }
 
 export default ServicioPeliculas;

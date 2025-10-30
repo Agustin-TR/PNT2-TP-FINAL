@@ -1,7 +1,8 @@
 <template>
-    <!--Form Entry: Nombre, edad e email-->
 
-    <!--Nombre-->
+    <h1>Iniciá sesión</h1>
+
+    <!--Form Entry: email y password-->
 
     <form novalidate @submit.prevent="enviar()">
         <!--Email-->
@@ -14,14 +15,14 @@
 
         <!--Password-->
         <div class="form-group col-8 mb-3 m-lg-3">
-            <label for="Edad" class="form-label">Edad</label>
-            <input type="number" id="edad" class="form-control" v-model.trim="formData.edad"
-                @input="formDirty.edad = true"></input>
-            <div v-if="errorEdad.mostrar" class="class alert alert-danger my-2">{{ errorEdad.mensaje }}</div>
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" id="password " class="form-control" v-model.trim="formData.password"
+                @input="formDirty.password = true"></input>
+            <div v-if="errorPassword.mostrar" class="class alert alert-danger my-2">{{ errorPassword.mensaje }}</div>
         </div>
 
         <div class="form-group col-8 mb-3 m-lg-3">
-            <button class="btn btn-success my-3" :disabled="canSend" @onclick="enviar()">Enviar</button>
+            <button class="btn btn-success my-3" :disabled="!canSend" @onclick="enviar()">Enviar</button>
             <!--disable si no esta todo completo-->
         </div>
     </form>
@@ -55,22 +56,19 @@ export default {
             formData: this.getInputs(),
             formDirty: this.getInputs(),
             dataEnviada: {},
-            edadMinima: 18,
-            edadMaxima: 120,
         }
     },
     methods: {
         getInputs() {
             return {
-                nombre: null,
-                edad: null,
+                password: null,
                 email: '',
             }
         },
         enviar() {
             const datos = { ...this.formData };
             this.dataEnviada = datos,
-                this.formData = this.getInputs(); //reinicio
+            this.formData = this.getInputs(); //reinicio
             this.formDirty = this.getInputs(); //reinicio
         },
         envio() {
@@ -78,19 +76,31 @@ export default {
         }
     },
     computed: {
-        errorEdad() {
+        errorPassword() {
             let msg = "";
-            if (!this.formData.edad) msg = "Este campo es requerido";
-            else if (this.formData.edad < this.edadMinima)
-                msg = "Debe ser mayor a 18 años";
-            else if (this.formData.edad >= this.edadMaxima)
-                msg = "Debe ser menor a 120 años";
-            return {
-                mensaje: msg, //Envio el mensaje
-                mostrar: msg != "" && this.formDirty.edad,
-                ok: msg == "",
+            const password = this.formData.password;
+
+            if (!password) {
+              msg = "Este campo es requerido";
+            } else if (password.length < 8) {
+              msg = "Debe tener al menos 8 caracteres";
+            } else if (!/[A-Z]/.test(password)) {
+              msg = "Debe incluir al menos una letra mayúscula";
+            } else if (!/[a-z]/.test(password)) {
+              msg = "Debe incluir al menos una letra minúscula";
+            } else if (!/[0-9]/.test(password)) {
+              msg = "Debe incluir al menos un número";
+            } else if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
+              msg = "Debe incluir al menos un símbolo especial";
             }
+        
+            return {
+              mensaje: msg,
+              mostrar: msg !== "" && this.formDirty.password,
+              ok: msg === "",
+            };
         },
+
         isValidEmail() {
             const email = this.formData.email
             const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -108,7 +118,7 @@ export default {
             }
         },
         canSend() {
-            return (!this.errorEdad.ok || !this.errorEmail.ok);
+            return (this.errorPassword.ok && this.errorEmail.ok);
         },
     }
 }
