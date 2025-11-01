@@ -5,8 +5,8 @@
         "apellido": "García",
         "email": "admin@admin.com",
         "password": "123",
-        "favoritos": [],
-        "watchlist": []
+        "favoritos": [1519168],
+        "watchlist": [507244, 338969, 1218925]
     },
     {
         "id": 2,

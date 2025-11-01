@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "./components/Home.vue";
 import Login from "./components/Login.vue";
 import Registro from "./components/Registro.vue";
-import Peliculas from "./components/Peliculas.vue";
+import Watchlist from "./components/Watchlist.vue";
 import PeliculaDetalle from "./components/PeliculaDetalle.vue";
 import Comparar from "./components/Comparar.vue";
 import Favoritos from "./components/Favoritos.vue";
@@ -13,7 +13,7 @@ const routes = [
     {path: "/Home", component: Home},
     {path: "/Login", component: Login}, 
     {path: "/Registro", component: Registro},
-    {path: "/Peliculas", component: Peliculas},
+    {path: "/Watchlist", component: Watchlist},
     {path: "/PeliculaDetalle/:id", name: "PeliculaDetalle", component: PeliculaDetalle},
     {path: "/Comparar", component: Comparar},
     {path: "/Favoritos", component: Favoritos},
