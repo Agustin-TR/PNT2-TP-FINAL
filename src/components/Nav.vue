@@ -20,13 +20,13 @@
                             data-bs-toggle="dropdown">nombreUsuario</a>
                         <ul class="dropdown-menu">
                             <li>
-                                <RouterLink class="dropdown-item" to="/Favoritos">Favoritos</RouterLink>
+                                <RouterLink class="dropdown-item" to="/Favoritos">⭐Favoritos</RouterLink>
                             </li>
                             <li>
-                                <RouterLink class="dropdown-item" to="/Comparar">Comparar</RouterLink>
+                                <RouterLink class="dropdown-item" to="/Comparar">🆚 Comparar</RouterLink>
                             </li>
                             <li>
-                                <RouterLink class="dropdown-item" to="/Comparar">tercer link</RouterLink>
+                                <RouterLink class="dropdown-item" to="/Watchlist">📌Watchlist</RouterLink>
                             </li>
                         </ul>
                     </li>

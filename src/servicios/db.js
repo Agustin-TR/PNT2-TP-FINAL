@@ -72,7 +72,6 @@ export const borrarWatchItem = (usuario, indice) => {
   }
 };
 
-
 // Para realizar pruebas en el navegador
 window.datosUsuarios = datosUsuarios;
 
