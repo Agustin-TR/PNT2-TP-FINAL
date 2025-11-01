@@ -1,7 +1,7 @@
     import { getUsuarios, findUserByEmail, saveUser } from './db'; 
 
     // Simula la logica de Id incremental de la DB. Removar luego de integrar DB
-    let nextId = getUsuarios.length > 0  ? Math.max(...getUsuarios.map((u) => u.id)) + 1 : 1;
+    let nextId = 7 /*getUsuarios.length > 0  ? Math.max(...getUsuarios.map((u) => u.id)) + 1 : 1;*/
 
     class AuthService {
         login = async (email, password) => { 
@@ -28,7 +28,7 @@
             nombre,
             apellido,
             email,
-            // NOTA DE SEGURIDAD: Aquí se debería HASHEAR la contraseña con bcrypt
+            // NOTA: Aquí se debería HASHEAR la contraseña con bcrypt una vez interado el backend
             password, 
             favoritos: [],
             watchlist: [],

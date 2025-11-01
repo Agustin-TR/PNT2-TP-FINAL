@@ -31,7 +31,7 @@ class FavoritosService {
         };
 
         setFavorito(usuario, nuevoFavorito);
-        return nuevoFavorito;
+        return true;
     };
     borrarDeFavoritos = async (userId, idPelicula) => {
         const usuario = findUser(userId);
