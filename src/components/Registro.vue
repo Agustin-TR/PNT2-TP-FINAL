@@ -52,6 +52,7 @@
 </template>
 
 <script scoped>
+import AuthService from '@/servicios/AuthService';
     export default {
         name: 'Form',
         data() {
@@ -72,11 +73,37 @@
                     password: null,
                 }
             },
-            enviar() {
-                const datos = { ...this.formData };
-                this.dataEnviada = datos,
-                this.formData = this.getInputs(); //reinicio
-                this.formDirty = this.getInputs(); //reinicio
+            async enviar() {
+                // Cláusula de guardia
+                if (!this.canSend) {
+                    this.serverError = "Por favor, completa y corrige todos los campos.";
+                    return;
+                }
+                
+                this.isLoading = true;
+                this.serverError = '';
+                
+                const datos = { ...this.formData }; // Copia superficial de los datos
+
+                try {
+                    // Llamada al servicio de registro (asíncrona)
+                    const nuevoUsuario = await AuthService.registro(datos);
+                    
+                    // Éxito
+                    this.dataEnviada = nuevoUsuario;
+                    this.formData = this.getInputs(); // reinicio
+                    this.formDirty = this.getInputs(); // reinicio
+                    
+                    // Opcional: Mostrar mensaje de éxito o redirigir
+                    alert(`¡Registro exitoso! Usuario: ${nuevoUsuario.email}`);
+
+                } catch (error) {
+                    // Capturar el error lanzado por AuthService (ej: "El email ya está registrado.")
+                    this.serverError = error.message || "Error desconocido al intentar registrar.";
+                    
+                } finally {
+                    this.isLoading = false;
+                }
             },
             envio() {
                 return Object.keys(this.dataEnviada).length === 0? "No hay info aún": this.dataEnviada

@@ -3,6 +3,7 @@
 </template>
 
 <script scoped>
+import ServicioUsuarios from '../servicios/peliculas';
     export default {
         name: 'Home',
         data() {
