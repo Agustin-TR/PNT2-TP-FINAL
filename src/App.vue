@@ -1,35 +1,33 @@
 <template>
-    <div class= "container-fluid">
-        <div>
-            <header>
-                
-            </header>
-            <main>
-                <Nav />
-                <RouterView />
-            </main>
-        </div>
-    </div>
+  <Navbar />
+ <main class="container-lg mt-4">
+   <RouterView />
+ </main>
 </template>
 
 <script>
-    import Nav from "./components/Nav.vue";
+import Navbar from "./components/Navbar.vue";
 
-    export default {
-            name: 'app',
-            components: {
-                Nav,
-            }
-        }
+export default {
+  name: "app",
+  components: {
+    Navbar,
+  },
+};
 </script>
-
 
 <style scoped>
 body {
   margin: 0;
   padding: 0;
 }
-main {
-    padding-top: 8vh;
+
+@font-face {
+    font-family: 'Pelli';
+    src: url('./assets/fonts/Playfair/static/Playfair_144pt-Regular.ttf') format('truetype');
+}
+
+.pelli-logo {
+    font-family: 'Pelli';
 }
 </style>
