@@ -1,32 +1,28 @@
 <template>
     <p>WatchList</p>
-    <div>{{ pelicula }}</div>
+    <div>{{ movie }}</div>
 </template>
 
 <script>
-import ServicioPeliculas from '@/servicios/peliculas';
 
-const ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1NjczMjI2MGUyZGE5MGEzOGEwNzhkZDEwM2MyODRmZiIsIm5iZiI6MTc2MTgzNDI3Ni4yODEsInN1YiI6IjY5MDM3NTI0M2FjMWEzNWM4NmU5OTZkOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.1PT2L_iOfHyAHqAgk56ERvoKF0ojmKDMwr2UOIqpI-w";
-
-const peliculasService = new ServicioPeliculas(ACCESS_TOKEN);
+    import movieService from '../services/movies';
 
     export default {
-        name: 'Watchlist', // 🔑 Cambiamos el nombre del componente
+        name: 'Watchlist', 
         data() {
             return {
-                pelicula : {}
+                movie : {}
             }
             
         },
         methods: {
-            async getPeliculas(id){
+            async getMovies(id){
                 id = 1218925 
-                // This is correct IF the service file uses 'export default { ... }'
-                this.pelicula = await ServicioPeliculas.getDetallesPelicula(id) 
+                this.movie = await movieService.getMovieDetails(id) 
             }
             },
         mounted(){
-            this.getPeliculas()
+            this.getMovies()
         },
         computed: {
         },

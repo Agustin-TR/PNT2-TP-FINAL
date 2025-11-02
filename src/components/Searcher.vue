@@ -151,7 +151,7 @@ export default {
 .form-control {
   border: none;
   box-shadow: none;
-  padding-right: 0.5rem; /* Ajuste para el icono */
+  padding-right: 0.5rem;
 }
 
 .input-group-text {
@@ -161,7 +161,6 @@ export default {
   padding-left: 0.5rem;
 }
 
-/* Estilo del Dropdown */
 .dropdown-menu {
   position: absolute;
   width: 100%;
