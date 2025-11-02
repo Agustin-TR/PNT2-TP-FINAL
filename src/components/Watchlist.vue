@@ -4,8 +4,9 @@
 </template>
 
 <script>
+import movieService from "../services/movies";
 
-    import movieService from '../services/movies';
+const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
     export default {
         name: 'Watchlist', 
@@ -18,7 +19,8 @@
         methods: {
             async getMovies(id){
                 id = 1218925 
-                this.movie = await movieService.getMovieDetails(id) 
+                // This is correct IF the service file uses 'export default { ... }'
+                this.pelicula = await MovieService.getDetallesPelicula(id) 
             }
             },
         mounted(){
