@@ -202,7 +202,6 @@ export default {
     },
   },
   computed: {
-    // All your computed properties were perfect and required no changes!
     firstNameError() {
       let msg = "";
       const firstName = this.formData.firstName;

@@ -1,6 +1,6 @@
 <template>
     <p>WatchList</p>
-    <div>{{ pelicula }}</div>
+    <div>{{ movie }}</div>
 </template>
 
 <script>
@@ -9,22 +9,22 @@ import movieService from "../services/movies";
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
     export default {
-        name: 'Watchlist', // 🔑 Cambiamos el nombre del componente
+        name: 'Watchlist', 
         data() {
             return {
-                pelicula : {}
+                movie : {}
             }
             
         },
         methods: {
-            async getPeliculas(id){
+            async getMovies(id){
                 id = 1218925 
                 // This is correct IF the service file uses 'export default { ... }'
                 this.pelicula = await MovieService.getDetallesPelicula(id) 
             }
             },
         mounted(){
-            this.getPeliculas()
+            this.getMovies()
         },
         computed: {
         },
