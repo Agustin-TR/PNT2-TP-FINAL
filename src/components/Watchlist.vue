@@ -1,5 +1,5 @@
 <template>
-
+    <p>WatchList</p>
 </template>
 
 <script>
