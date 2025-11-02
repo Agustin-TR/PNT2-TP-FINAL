@@ -30,5 +30,14 @@
   "description": "This template should help get you started developing with Vue 3 in Vite.",
   "main": "vite.config.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Agustin-TR/PNT2-TP-FINAL.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/Agustin-TR/PNT2-TP-FINAL/issues"
+  },
+  "homepage": "https://github.com/Agustin-TR/PNT2-TP-FINAL#readme"
 }
