@@ -79,7 +79,9 @@ export default {
     },
     methods: {
         goToWatchlist() {
+            this.$router.push('/Watchlist');
             console.log('Navegando a la Watchlist...');
+            
         },
         
         toggleWatchlist(movieId) {

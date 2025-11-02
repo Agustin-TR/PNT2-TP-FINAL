@@ -12,7 +12,6 @@ export const setFavorito = (usuario, nuevoFavorito) => {
       console.log("Favorito agregado");
   }
 };
-
 export const borrarFavorito = (usuario, indice) => {
   if (
     usuario &&
