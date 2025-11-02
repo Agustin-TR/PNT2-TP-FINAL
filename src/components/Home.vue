@@ -30,6 +30,15 @@
                             {{ movie.title }}
                         </h6>
                         <p class="card-text small text-muted">{{ movie.year }}</p>
+
+                        <button
+                            class="btn btn-sm w-100"
+                            :class="isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
+                            @click.stop="toggleFavs(movie.id)" 
+                            id="btn-favs"
+                        >
+                            {{ isFavorite(movie.id) ? '❤️' : '+ ♡' }}
+                        </button>
                         
                         <button
                             class="btn btn-sm w-100"
@@ -70,9 +79,10 @@ const movieService = new ServicioPeliculas(TMDB_ACCESS_TOKEN);
 export default {
     name: 'Home',
     data() {
-        return {
+        return { 
             movies: [], // Deja esto vacío, se llenará con la API
             watchlist: [],
+            favorites: [], //array para guardar las peliculas como favoritas 
             loading: true, // Inicializa como true para mostrar el spinner al inicio
             error: null, // Para manejar errores
         }
@@ -82,6 +92,15 @@ export default {
             this.$router.push('/Watchlist');
             console.log('Navegando a la Watchlist...');
             
+        },
+
+        toggleFavs(movieId) {
+            const index = this.favorites.indexOf(movieId);
+            if (index > -1) {
+                this.favorites.splice(index, 1);
+            } else {
+                this.favorites.push(movieId);
+            }
         },
         
         toggleWatchlist(movieId) {
@@ -95,6 +114,10 @@ export default {
 
         isAdded(movieId) {
             return this.watchlist.includes(movieId);
+        },
+
+        isFavorite(movieId) {
+            return this.favorites.includes(movieId);
         },
 
         goToDetails(movieId) {
@@ -142,3 +165,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    #btn-favs{
+        margin-bottom: 5px;
+    }
+</style>

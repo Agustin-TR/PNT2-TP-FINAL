@@ -1,4 +1,5 @@
 <template>
+    <p>WatchList</p>
     <div>{{ pelicula }}</div>
 </template>
 
