@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="reactive-searcher dropdown ms-auto me-3"
-    :class="{ show: showDropdown }"
-  >
+  <div class="reactive-searcher dropdown me-3" :class="{ show: showDropdown }">
     <div class="input-group">
       <input
         type="text"
@@ -28,7 +25,7 @@
       @mousedown.prevent
     >
       <li v-if="loading" class="dropdown-item text-center">
-       <Spinner /> 
+        <Spinner />
       </li>
 
       <li v-else-if="results.length" v-for="movie in results" :key="movie.id">
@@ -62,7 +59,6 @@
 import debounce from "lodash.debounce";
 import movieService from "../services/movies";
 import Spinner from "./Spinner.vue";
-
 
 export default {
   name: "Searcher",
@@ -138,8 +134,13 @@ export default {
 <style scoped>
 .reactive-searcher {
   position: relative;
-  width: 500px;
-  margin-right: 20px;
+  width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .reactive-searcher {
+    max-width: 600px;
+  }
 }
 
 .input-group {

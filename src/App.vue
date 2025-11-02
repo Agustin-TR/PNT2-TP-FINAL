@@ -15,19 +15,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-body {
-  margin: 0;
-  padding: 0;
-}
-
-@font-face {
-    font-family: 'Pelli';
-    src: url('./assets/fonts/Playfair/static/Playfair_144pt-Regular.ttf') format('truetype');
-}
-
-.pelli-logo {
-    font-family: 'Pelli';
-}
-</style>
