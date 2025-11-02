@@ -1,128 +1,173 @@
 <template>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card border-0 rounded-lg mt-5">
+          <div class="card-body p-4 p-md-5">
+            <form novalidate @submit.prevent="submit()">
+              <div class="mb-4">
+                <label for="email" class="form-label fw-bold"
+                  >Email address</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  class="form-control form-control-lg"
+                  :class="{
+                    'is-invalid': errorEmail.show,
+                    'is-valid': formDirty.email && errorEmail.ok,
+                  }"
+                  v-model.trim="formData.email"
+                  @input="formDirty.email = true"
+                  placeholder="name@example.com"
+                />
+              </div>
 
-    <h1>Iniciá sesión</h1>
+              <div class="mb-4">
+                <label for="password" class="form-label fw-bold"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  id="password"
+                  class="form-control form-control-lg"
+                  :class="{
+                    'is-invalid': errorPassword.show,
+                    'is-valid': formDirty.password && errorPassword.ok,
+                  }"
+                  v-model.trim="formData.password"
+                  @input="formDirty.password = true"
+                  placeholder="Enter your password"
+                />
+              </div>
 
-    <!--Form Entry: email y password-->
+              <div v-if="errorMessage" class="alert alert-danger">
+                {{ errorMessage }}
+              </div>
 
-    <form novalidate @submit.prevent="enviar()">
-        <!--Email-->
-        <div class="form-group col-8 mb-3 m-lg-3">
-            <label for="Email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" v-model.trim="formData.email"
-                @input="formDirty.email = true"></input>
-            <div v-if="errorEmail.mostrar" class="class alert alert-danger my-2">{{ errorEmail.mensaje }}</div>
+              <div class="d-grid mb-4">
+                <button
+                  class="btn btn-dark btn-lg"
+                  :disabled="!canSend"
+                  type="submit"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+
+            <div class="text-center mt-4">
+              <p class="text-muted">
+                Don't have an account?
+                <router-link
+                  to="/signup"
+                  class="text-dark fw-bold text-decoration-none"
+                  >Sign Up</router-link
+                >
+              </p>
+            </div>
+          </div>
         </div>
-
-        <!--Password-->
-        <div class="form-group col-8 mb-3 m-lg-3">
-            <label for="password" class="form-label">Contraseña</label>
-            <input type="password" id="password " class="form-control" v-model.trim="formData.password"
-                @input="formDirty.password = true"></input>
-            <div v-if="errorPassword.mostrar" class="class alert alert-danger my-2">{{ errorPassword.mensaje }}</div>
-        </div>
-
-        <div class="form-group col-8 mb-3 m-lg-3">
-            <button class="btn btn-success my-3" :disabled="!canSend" @onclick="enviar()">Enviar</button>
-            <!--disable si no esta todo completo-->
-        </div>
-    </form>
-    <!--Form Show: Nombre, edad e email-->
-    <div class="card shadow-sm mt-4 col-8 mb-3 m-lg-3" v-show="Object.keys(dataEnviada).length > 0">
-        <div class="card-body">
-            <h5 class="card-title mb-3 text-dark">📮 Información Enviada</h5>
-            <ul>
-                <li v-for="(value, key) in envio()" :key="key">
-                    <strong>{{ key }}:</strong> {{ value }}
-                </li>
-            </ul>
-        </div>
+      </div>
     </div>
-
-    <div class="form-group col-8 mb-3 m-lg-3">
-        <p>
-            ¿No tenés cuenta?
-            <router-link to="/registro" class="text-primary text-decoration-underline">Registrate</router-link>
-        </p>
-    </div>
-
-
+  </div>
 </template>
 
-<script scoped>
+<script>
+import { useAuthStore } from "@/stores/authStore";
+import authService from "@/services/auth";
+
 export default {
-    name: 'Form',
-    data() {
-        return {
-            formData: this.getInputs(),
-            formDirty: this.getInputs(),
-            dataEnviada: {},
-        }
+  name: "Login",
+  data() {
+    return {
+      formData: this.getInputs(),
+      formDirty: this.getInputs(),
+      submittedData: {},
+      errorMessage: null,
+    };
+  },
+  methods: {
+    getInputs() {
+      return {
+        password: null,
+        email: "",
+      };
     },
-    methods: {
-        getInputs() {
-            return {
-                password: null,
-                email: '',
-            }
-        },
-        enviar() {
-            const datos = { ...this.formData };
-            this.dataEnviada = datos,
-            this.formData = this.getInputs(); //reinicio
-            this.formDirty = this.getInputs(); //reinicio
-        },
-        envio() {
-            return Object.keys(this.dataEnviada).length === 0 ? "No hay info aún" : this.dataEnviada
-        }
+    async submit() {
+      if (!this.canSend) return;
+
+      this.errorMessage = null;
+
+      const authStore = useAuthStore();
+
+      const submitted = { ...this.formData };
+      this.submittedData = submitted;
+
+      this.formData = this.getInputs();
+      this.formDirty = this.getInputs();
+
+      try {
+        const user = await authService.login(
+          submitted.email,
+          submitted.password
+        );
+
+        authStore.login(user);
+        this.$router.push("/");
+      } catch (error) {
+        console.error("Login failed:", error);
+        this.errorMessage = error.message || "Login failed. Please try again.";
+      }
+
+      console.log("Form Submitted:", submitted);
     },
-    computed: {
-        errorPassword() {
-            let msg = "";
-            const password = this.formData.password;
+    submissionEntries() {
+      return Object.keys(this.submittedData).length === 0
+        ? { message: "No info yet" } // Return an object for consistent display
+        : this.submittedData;
+    },
+  },
+  computed: {
+    errorPassword() {
+      let msg = "";
+      const password = this.formData.password;
 
-            if (!password) {
-              msg = "Este campo es requerido";
-            } else if (password.length < 8) {
-              msg = "Debe tener al menos 8 caracteres";
-            } else if (!/[A-Z]/.test(password)) {
-              msg = "Debe incluir al menos una letra mayúscula";
-            } else if (!/[a-z]/.test(password)) {
-              msg = "Debe incluir al menos una letra minúscula";
-            } else if (!/[0-9]/.test(password)) {
-              msg = "Debe incluir al menos un número";
-            } else if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
-              msg = "Debe incluir al menos un símbolo especial";
-            }
-        
-            return {
-              mensaje: msg,
-              mostrar: msg !== "" && this.formDirty.password,
-              ok: msg === "",
-            };
-        },
+      // On a login form, we ONLY check if the field is empty.
+      // All other complexity rules should be removed.
+      if (!password) {
+        msg = "Password is required";
+      }
 
-        isValidEmail() {
-            const email = this.formData.email
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            return regex.test(email)
-        },
-        errorEmail() {
-            let msg = "";
-            if (!this.formData.email) msg = "Este campo es requerido";
-            else if (!this.isValidEmail)
-                msg = `Ingrese un email valido por favor`;
-            return {
-                mensaje: msg,
-                mostrar: msg != "" && this.formDirty.email,
-                ok: msg == "",
-            }
-        },
-        canSend() {
-            return (this.errorPassword.ok && this.errorEmail.ok);
-        },
-    }
-}
+      return {
+        message: msg,
+        show: msg !== "" && this.formDirty.password,
+        ok: msg === "",
+      };
+    },
 
+    isValidEmail() {
+      const email = this.formData.email;
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return regex.test(email);
+    },
+
+    errorEmail() {
+      let msg = "";
+      if (!this.formData.email) msg = "Email is required";
+      else if (!this.isValidEmail) msg = "Please enter a valid email address.";
+      return {
+        message: msg,
+        show: msg != "" && this.formDirty.email,
+        ok: msg == "",
+      };
+    },
+
+    canSend() {
+      return this.errorPassword.ok && this.errorEmail.ok;
+    },
+  },
+};
 </script>
 
 <style scoped></style>
