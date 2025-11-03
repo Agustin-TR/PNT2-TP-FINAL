@@ -49,7 +49,7 @@
             :class="isAdded(movie.id) ? 'btn-success' : 'btn-primary'"
             @click.stop="toggleWatchlist(movie.id)"
           >
-            {{ isAdded(movie.id) ? "✅ En Watchlist" : "+ Watchlist" }}
+            {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
           </button>
         </div>
       </div>

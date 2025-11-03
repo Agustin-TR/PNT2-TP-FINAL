@@ -70,8 +70,6 @@ export default {
   },
   name: "Navbar",
   computed: {
-    // Tu código ya era correcto. mapState puede traer tanto 'state' como 'getters'.
-    // Asumiendo que 'isAuthenticated' es un getter y 'user' es state, esto funciona.
     ...mapState(useAuthStore, ["isAuthenticated", "user"]),
   },
   methods: {
