@@ -69,15 +69,23 @@
 
 <script>
 import movieService from "../services/movies";
+import WatchlistService from "../services/watchlist";
+import { useAuthStore } from "../stores/authStore"; 
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
 export default {
   name: "Home",
+  // Setup is used to access the Pinia store in the Options API
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   data() {
     return {
       movies: [],
-      watchlist: [],
+      // watchlist holds movie IDs as strings, matching your service/db
+      watchlist: [], 
       favorites: [],
       loading: true,
       error: null,
@@ -87,10 +95,36 @@ export default {
     watchlistCount() {
       return this.watchlist.length;
     },
+    // Reactive computed property to get the logged-in user's ID
+    userId() {
+      return this.authStore.user ? this.authStore.user.id : null;
+    }
   },
   methods: {
     goToWatchlist() {
       this.$router.push("/watchlist");
+    },
+    /**
+     * Fetches the user's current watchlist from the service.
+     */
+    async getWatchlist() {
+      // GUARD RAIL: Check for user ID
+      if (!this.userId) {
+        console.warn("No user ID found. Cannot fetch watchlist.");
+        this.watchlist = []; // Ensure the local list is empty if not logged in
+        return; 
+      }
+      
+      try {
+        // Fetch movie IDs using the logged-in user's ID
+        const movieIds = await WatchlistService.getAllWatchlist(this.userId);
+        
+        // Ensure movie IDs are consistently strings (as used in toggleWatchlist and isAdded)
+        this.watchlist = movieIds.map(String); 
+        
+      } catch (error) {
+        console.error("Error fetching watchlist:", error);
+      }
     },
     toggleFavs(movieId) {
       const index = this.favorites.indexOf(movieId);
@@ -100,16 +134,43 @@ export default {
         this.favorites.push(movieId);
       }
     },
-    toggleWatchlist(movieId) {
-      const index = this.watchlist.indexOf(movieId);
-      if (index > -1) {
-        this.watchlist.splice(index, 1);
-      } else {
-        this.watchlist.push(movieId);
+    
+    /**
+     * Toggles a movie's presence in the watchlist, persisting the change via the service.
+     * @param {number} movieId The ID of the movie to toggle.
+     */
+    async toggleWatchlist(movieId) {
+      const movieIdStr = String(movieId);
+      
+      // GUARD RAIL: Prevent action if the user is not logged in
+      if (!this.userId) {
+        alert("Please log in to add items to your watchlist.");
+        return;
+      }
+
+      const isCurrentlyAdded = this.watchlist.includes(movieIdStr);
+      
+      try {
+        if (isCurrentlyAdded) {
+          // Remove from watchlist
+          // Assuming service returns the updated list (as per your initial service structure)
+          const newWatchlist = await WatchlistService.removeFromWatchlist(this.userId, movieIdStr);
+          this.watchlist = newWatchlist.map(String); 
+        } else {
+          // Add to watchlist
+          await WatchlistService.addToWatchlist(this.userId, movieIdStr);
+          // Manually update the local state for immediate visual feedback
+          this.watchlist.push(movieIdStr);
+        }
+      } catch (error) {
+        console.error(`Error toggling watchlist for movie ${movieId}:`, error);
+        alert(`Could not update watchlist: ${error.message}`);
       }
     },
+    
     isAdded(movieId) {
-      return this.watchlist.includes(movieId);
+      // Check for existence using the movie ID cast as a string
+      return this.watchlist.includes(String(movieId));
     },
     isFavorite(movieId) {
       return this.favorites.includes(movieId);
@@ -142,7 +203,12 @@ export default {
     },
   },
   async mounted() {
-    await this.fetchPopularMovies();
+    // 1. Fetch popular movies first
+    await this.fetchPopularMovies(); 
+    
+    // 2. Fetch the user's watchlist immediately after. 
+    // This populates the watchlist array and sets the initial state for isAdded().
+    await this.getWatchlist(); 
   },
 };
 </script>

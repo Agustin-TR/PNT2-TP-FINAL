@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container-lg d-flex flex-column align-items-center">
       <div class="d-flex justify-content-between align-items-center w-100">
-        <RouterLink class="navbar-brand pelli-logo" to="/">Pelli</RouterLink>
+        <RouterLink class="navbar-brand pelli-logo" to="/">Peli</RouterLink>
 
         <button
           class="navbar-toggler"
@@ -32,7 +32,7 @@
                 <RouterLink class="nav-link" to="/films">Films</RouterLink>
               </li>
               <li class="nav-item">
-                <RouterLink class="nav-link" to="/lists">Lists</RouterLink>
+                <RouterLink class="nav-link" to="/wathlist">Watchlist</RouterLink>
               </li>
               <li class="nav-item">
                 <RouterLink class="nav-link" to="/favorites"

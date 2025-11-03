@@ -57,8 +57,9 @@
 
 <script>
 import debounce from "lodash.debounce";
-import movieService from "../services/movies";
+import MovieService from "../services/movies";
 import Spinner from "./Spinner.vue";
+const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
 export default {
   name: "Searcher",
@@ -91,7 +92,7 @@ export default {
 
       try {
         // Call the searchMovies method from movies.js
-        const data = await movieService.searchMovies(query);
+        const data = await MovieService.searchMovies(query);
 
         // Map and limit the results for the dropdown (max 7)
         this.results = data
