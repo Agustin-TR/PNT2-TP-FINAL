@@ -21,89 +21,96 @@
     </div>
 
     <div v-else class="table-responsive">
-      <table class="table table-striped table-hover align-middle">
+    <table class="table table-striped table-hover align-middle">
         <thead class="table-dark">
-          <tr>
+        <tr>
             <th scope="col">#</th>
             <th scope="col" @click="sortBy('title')" class="sortable">
-              Title
-              <i :class="getSortIcon('title')"></i>
+            <div class="d-flex align-items-center justify-content-between">
+                Title
+                <i :class="getSortIcon('title')"></i>
+            </div>
             </th>
             <th scope="col">Tagline</th>
             <th scope="col" @click="sortBy('vote_average')" class="sortable text-center">
-              Rating
-              <i :class="getSortIcon('vote_average')"></i>
+            <div class="d-flex align-items-center justify-content-center">
+                Rating
+                <i :class="getSortIcon('vote_average')"></i>
+            </div>
             </th>
             <th scope="col" @click="sortBy('release_date')" class="sortable text-nowrap">
-              Release Date
-              <i :class="getSortIcon('release_date')"></i>
+            <div class="d-flex align-items-center justify-content-start">
+                Release Date
+                <i :class="getSortIcon('release_date')"></i>
+            </div>
             </th>
             <th scope="col" @click="sortBy('runtime')" class="sortable text-center">
-              Runtime
-              <i :class="getSortIcon('runtime')"></i>
+            <div class="d-flex align-items-center justify-content-center">
+                Runtime
+                <i :class="getSortIcon('runtime')"></i>
+            </div>
             </th>
             <th scope="col">Genres</th>
             <th scope="col" class="text-center">Poster</th>
             <th scope="col" class="text-center">Actions</th>
-          </tr>
+        </tr>
         </thead>
         <tbody>
-          <tr v-for="(movie, index) in sortedWatchlist" :key="movie.id">
+        <tr v-for="(movie, index) in sortedWatchlist" :key="movie.id">
             <th scope="row">{{ index + 1 }}</th>
             <td><strong>{{ movie.title }}</strong></td> 
             <td class="text-muted small">{{ movie.tagline || 'N/A' }}</td>
             <td class="text-center">
-              <span class="badge bg-warning text-dark">{{ formatRating(movie.vote_average) }}</span>
+            <span class="badge bg-warning text-dark">{{ formatRating(movie.vote_average) }}</span>
             </td>
             <td>{{ formatDate(movie.release_date) }}</td>
             <td class="text-center">{{ movie.runtime }} min</td>
             <td>{{ formatGenres(movie.genres) }}</td>
             
             <td class="text-center">
-              <img
+            <img
                 :src="getPosterUrl(movie.poster_path)"
                 :alt="`Poster for ${movie.title}`"
                 class="poster-thumbnail"
                 @click="showPosterModal(movie.poster_path)"
                 loading="lazy"
-              />
+            />
             </td>
             <td class="text-center text-nowrap">
-              <button 
+            <button 
                 @click="toggleFavorite(movie.id)" 
                 :class="['btn', 'btn-sm', 'me-2', isFavorite(movie.id) ? 'btn-warning' : 'btn-outline-warning']"
                 :title="isFavorite(movie.id) ? 'Remove from Favorites' : 'Add to Favorites'"
-              >
+            >
                 <i :class="isFavorite(movie.id) ? 'bi bi-star-fill' : 'bi bi-star'"></i>
-              </button>
-              
-              <button @click="removeItem(movie.id)" class="btn btn-sm btn-outline-danger" title="Remove from Watchlist">
+            </button>
+            
+            <button @click="removeItem(movie.id)" class="btn btn-sm btn-outline-danger" title="Remove from Watchlist">
                 <i class="bi bi-trash"></i>
-              </button>
+            </button>
             </td>
-          </tr>
+        </tr>
         </tbody>
-      </table>
+    </table>
     </div>
 
     <div 
-      v-if="showModal" 
-      class="modal fade show h-500" 
-      tabindex="-1" 
-      role="dialog" 
-      style="display: block; background-color: rgba(0, 0, 0, 0.7);"
-      @click.self="hidePosterModal"
+    v-if="showModal" 
+    class="modal fade show" 
+    tabindex="-1" 
+    role="dialog" 
+    style="display: block; background-color: rgba(0, 0, 0, 0.7);" 
+    @click.self="hidePosterModal"
     >
-      <div class="modal-dialog modal-lg modal-dialog-centered **modal-dialog-scrollable**" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content">
-          <div class="modal-header border-0 pb-0">
+        <div class="modal-header border-0 pb-0">
             <button type="button" class="btn-close" aria-label="Close" @click="hidePosterModal"></button>
-          </div>
-          <div class="modal-body pt-0 text-center">
-            <img :src="modalPosterUrl" class="img-fluid rounded" alt="Large Movie Poster" />
-          </div>
         </div>
-      </div>
+        <div class="modal-body pt-0 text-center custom-modal-body"> <img :src="modalPosterUrl" class="img-fluid rounded" alt="Large Movie Poster" />
+        </div>
+        </div>
+    </div>
     </div>
     
   </div>
@@ -361,44 +368,48 @@ export default {
 };
 </script>
 
-<style scoped>
-    /* ... existing styles ... */
+    <style scoped>
+        /* ... existing styles ... */
 
-    /* Styles for the poster thumbnail and modal */
-    .poster-thumbnail {
-    width: 50px; 
-    height: 75px; 
-    object-fit: cover; 
-    border-radius: 4px;
-    cursor: pointer; 
-    transition: transform 0.2s;
-    }
+        /* Styles for the poster thumbnail and modal */
+        .poster-thumbnail {
+        width: 50px; 
+        height: 75px; 
+        object-fit: cover; 
+        border-radius: 4px;
+        cursor: pointer; 
+        transition: transform 0.2s;
+        }
 
-    .poster-thumbnail:hover {
-        transform: scale(1.05);
-    }
+        .poster-thumbnail:hover {
+            transform: scale(1.05);
+        }
 
-    .modal-content {
-        background-color: #fefefe; 
-    }
+        .modal-content {
+            background-color: #fefefe; 
+        }
+        .modal-body img {
+        /* Limit the height to ensure the modal fits within the screen */
+        max-height: 85vh; /* 85% of the viewport height (leaving 15% for padding/header/footer) */
+        width: auto; /* Allow width to scale based on aspect ratio */
+        max-width: 100%; /* Ensure it doesn't overflow horizontally */
+        }
+        /* Ensure actions column has enough width */
+        .text-nowrap {
+            white-space: nowrap;
+        }
+        .sortable > .d-flex {
+        /* This ensures the header content takes up the full width/height of the TH */
+        width: 100%;
+        height: 100%; 
+        /* Using `justify-content-start` or `space-between` controls horizontal spacing */
+        }
 
-    /* Custom styles to limit image height within the modal */
-    .custom-modal-body img {
-        max-height: 500px; 
-        width: auto;
-        max-width: 100%; /* Ensures it scales down on narrow screens */
-        height: auto; /* Maintains aspect ratio */
-    }
-
-    /* Ensure the image respects the container's height constraint */
-    .custom-modal-body img {
-        max-height: 80vh; 
-        width: auto;
-        max-width: 100%;
-    }
-
-    /* Ensure actions column has enough width */
-    .text-nowrap {
-        white-space: nowrap;
-    }
-</style>
+        /* Fix for icon shifting/bouncing */
+        .sortable i {
+        /* Set a fixed, small size for the icon to reserve space */
+        min-width: 1em; 
+        text-align: center;
+        transition: opacity 0.1s; /* Smooth transition for icon appearance */
+        }
+    </style>
