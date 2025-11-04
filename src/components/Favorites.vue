@@ -1,6 +1,8 @@
 
 <template>
-    <p>⭐Favorites</p>
+    <h2 class="mb-4">
+      ⭐Favorites
+    </h2>
 </template>
 
 <script scoped>

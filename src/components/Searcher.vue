@@ -134,13 +134,14 @@ export default {
 
 <style scoped>
 .reactive-searcher {
-  position: relative;
+  position: absolute;
+  align-self: center;
   width: 100%;
 }
 
 @media screen and (min-width: 768px) {
   .reactive-searcher {
-    max-width: 600px;
+    max-width: 500px;
   }
 }
 
