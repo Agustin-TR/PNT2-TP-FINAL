@@ -4,7 +4,7 @@
       <input
         type="text"
         class="form-control"
-        placeholder="Star Wars"
+        placeholder="Search"
         v-model="searchText"
         @input="debouncedSearch"
         @focus="showDropdown = true"
@@ -134,14 +134,13 @@ export default {
 
 <style scoped>
 .reactive-searcher {
-  position: absolute;
-  align-self: center;
+  position: relative;
   width: 100%;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 100px) {
   .reactive-searcher {
-    max-width: 500px;
+    max-width: 700px;
   }
 }
 
