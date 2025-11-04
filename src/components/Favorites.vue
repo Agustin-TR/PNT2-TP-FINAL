@@ -1,6 +1,6 @@
 
 <template>
-    <p>Favorites</p>
+    <p>⭐Favorites</p>
 </template>
 
 <script scoped>

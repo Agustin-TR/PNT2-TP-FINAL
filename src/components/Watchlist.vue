@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
     <h2 class="mb-4">
-      <i class="bi bi-star-fill text-warning me-2"></i>My Watchlist
+      <i class="bi bi-star-fill text-warning me-2"></i>📺 My Watchlist
     </h2>
 
     <div v-if="!isAuthenticated" class="alert alert-danger" role="alert">
