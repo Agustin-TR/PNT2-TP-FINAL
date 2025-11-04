@@ -23,8 +23,8 @@ class WatchlistService {
   removeFromWatchlist = async (userId, movieId) => {
     const user = findUser(userId);
     if (!user) throw new Error("User not found.");
-
     const idStr = String(movieId);
+
     const index = user.watchlist.findIndex((id) => id === idStr);
 
     if (index === -1) {

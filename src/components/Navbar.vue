@@ -32,7 +32,7 @@
                 <RouterLink class="nav-link" to="/films">Films</RouterLink>
               </li>
               <li class="nav-item">
-                <RouterLink class="nav-link" to="/wathlist">Watchlist</RouterLink>
+                <RouterLink class="nav-link" to="/watchlist">Watchlist</RouterLink>
               </li>
               <li class="nav-item">
                 <RouterLink class="nav-link" to="/favorites"
