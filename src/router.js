@@ -7,6 +7,7 @@ import Watchlist from "./components/Watchlist.vue";
 import Movie from "./components/Movie.vue";
 import Compare from "./components/Compare.vue";
 import Favorites from "./components/Favorites.vue";
+import NotFound from "./components/NotFound.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -17,8 +18,7 @@ const routes = [
   { path: "/compare", component: Compare },
   { path: "/favorites", component: Favorites },
 
-  // Redirect to home for any unmatched routes
-  { path: "/:pathmatch", redirect: "/" },
+  { path: "/:pathmatch(.*)*", component: NotFound },
 ];
 
 const router = createRouter({

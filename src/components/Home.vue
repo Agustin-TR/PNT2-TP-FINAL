@@ -70,7 +70,7 @@
 <script>
 import movieService from "../services/movies";
 import WatchlistService from "../services/watchlist";
-import { useAuthStore } from "../stores/authStore"; 
+import { useAuthStore } from "../stores/authStore";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
@@ -85,7 +85,7 @@ export default {
     return {
       movies: [],
       // watchlist holds movie IDs as strings, matching your service/db
-      watchlist: [], 
+      watchlist: [],
       favorites: [],
       loading: true,
       error: null,
@@ -98,7 +98,7 @@ export default {
     // Reactive computed property to get the logged-in user's ID
     userId() {
       return this.authStore.user ? this.authStore.user.id : null;
-    }
+    },
   },
   methods: {
     goToWatchlist() {
@@ -112,16 +112,15 @@ export default {
       if (!this.userId) {
         console.warn("No user ID found. Cannot fetch watchlist.");
         this.watchlist = []; // Ensure the local list is empty if not logged in
-        return; 
+        return;
       }
-      
+
       try {
         // Fetch movie IDs using the logged-in user's ID
         const movieIds = await WatchlistService.getAllWatchlist(this.userId);
-        
+
         // Ensure movie IDs are consistently strings (as used in toggleWatchlist and isAdded)
-        this.watchlist = movieIds.map(String); 
-        
+        this.watchlist = movieIds.map(String);
       } catch (error) {
         console.error("Error fetching watchlist:", error);
       }
@@ -134,14 +133,14 @@ export default {
         this.favorites.push(movieId);
       }
     },
-    
+
     /**
      * Toggles a movie's presence in the watchlist, persisting the change via the service.
      * @param {number} movieId The ID of the movie to toggle.
      */
     async toggleWatchlist(movieId) {
       const movieIdStr = String(movieId);
-      
+
       // GUARD RAIL: Prevent action if the user is not logged in
       if (!this.userId) {
         alert("Please log in to add items to your watchlist.");
@@ -149,13 +148,16 @@ export default {
       }
 
       const isCurrentlyAdded = this.watchlist.includes(movieIdStr);
-      
+
       try {
         if (isCurrentlyAdded) {
           // Remove from watchlist
           // Assuming service returns the updated list (as per your initial service structure)
-          const newWatchlist = await WatchlistService.removeFromWatchlist(this.userId, movieIdStr);
-          this.watchlist = newWatchlist.map(String); 
+          const newWatchlist = await WatchlistService.removeFromWatchlist(
+            this.userId,
+            movieIdStr
+          );
+          this.watchlist = newWatchlist.map(String);
         } else {
           // Add to watchlist
           await WatchlistService.addToWatchlist(this.userId, movieIdStr);
@@ -167,7 +169,7 @@ export default {
         alert(`Could not update watchlist: ${error.message}`);
       }
     },
-    
+
     isAdded(movieId) {
       // Check for existence using the movie ID cast as a string
       return this.watchlist.includes(String(movieId));
@@ -204,11 +206,11 @@ export default {
   },
   async mounted() {
     // 1. Fetch popular movies first
-    await this.fetchPopularMovies(); 
-    
-    // 2. Fetch the user's watchlist immediately after. 
+    await this.fetchPopularMovies();
+
+    // 2. Fetch the user's watchlist immediately after.
     // This populates the watchlist array and sets the initial state for isAdded().
-    await this.getWatchlist(); 
+    await this.getWatchlist();
   },
 };
 </script>

@@ -4,8 +4,37 @@
       <Spinner />
     </div>
 
-    <div v-else-if="error" class="alert alert-danger" role="alert">
-      {{ error }}
+    <div
+      v-else-if="error"
+      class="d-flex flex-column flex-lg-row align-items-center justify-content-center gap-4 mt-5"
+    >
+      <div class="text-center text-lg-start">
+        <h1 class="title">
+          Houston, we have a
+          <span class="text-danger text-decoration-underline">problem</span>
+        </h1>
+
+        <p class="fs-4 fw-semibold">
+          There was an error loading the movie details.
+        </p>
+
+        <p class="fs-5 text-muted mb-4">
+          {{ error }}
+        </p>
+
+        <button
+          class="btn btn-outline-danger btn-lg rounded-pill px-4"
+          @click="fetchMovieDetails"
+        >
+          Retry
+        </button>
+      </div>
+
+      <img
+        src="../assets/movie-not-found.svg"
+        class="img-fluid"
+        alt="Movie not found"
+      />
     </div>
 
     <div v-else-if="movie" class="row">
@@ -124,6 +153,24 @@ export default {
 
 <style scoped>
 .rounded {
-  border-radius: 0.5rem !important;
+  border-radius: 0.5rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+img {
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .title {
+    font-size: 4.5rem;
+  }
+  img {
+    width: 50%;
+  }
 }
 </style>
