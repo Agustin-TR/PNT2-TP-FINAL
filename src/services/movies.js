@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 const accessToken = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
 const baseUrl = import.meta.env.VITE_TMDB_URL;
 
@@ -94,6 +93,32 @@ class MovieService {
 
     try {
       const url = `${this.#baseUrl}/movie/${id}`;
+
+      const headers = {
+        accept: "application/json",
+        Authorization: `Bearer ${this.#accessToken}`,
+      };
+
+      const params = {
+        language: "en-US",
+      };
+
+      const { data } = await axios.get(url, { headers, params });
+
+      return data;
+    } catch (error) {
+      console.error(`Error fetching movie details ${id}:`, error.message);
+      throw error;
+    }
+  };
+
+  getMovieReviews = async (id) => {
+    if (!id) {
+      throw new Error("Movie ID is required.");
+    }
+
+    try {
+      const url = `${this.#baseUrl}/movie/${id}/reviews`;
 
       const headers = {
         accept: "application/json",
