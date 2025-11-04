@@ -1,5 +1,7 @@
 <template>
-    <p>Compare</p>
+    <h2 class="mb-4">
+        🆚 Compare
+    </h2>
 </template>
 
 <script scoped>
