@@ -155,6 +155,8 @@
     import movieService from "../services/movies";
     import userAvatar from "../assets/user.svg";
     import WatchlistService from "../services/watchlist";
+    import AlertMessage from "./AlertMessage.vue";
+    import { alertMessage, alertType, showSuccess, showError } from "../stores/alertStore"
 
     const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
@@ -166,6 +168,7 @@
     },
     components: {
         Spinner,
+        AlertMessage,
     },
     props: ["id"],
     data() {
@@ -179,7 +182,7 @@
     },
     computed: {
         userId() {
-        return this.authStore.user?.id;
+        return this.authStore.user ? this.authStore.user.id : null;
         },
         releaseYear() {
         return this.movie?.release_date
