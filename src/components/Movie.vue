@@ -246,9 +246,10 @@ img {
 }
 
 .text-truncate-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Esta es la propiedad para navegadores basados en WebKit */
+    line-clamp: 3; /* ESTA ES LA PROPIEDAD ESTÁNDAR Y CORREGIDA */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 </style>
