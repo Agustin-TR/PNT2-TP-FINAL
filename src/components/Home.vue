@@ -15,7 +15,7 @@
     <div
       v-for="movie in movies"
       :key="movie.id"
-      class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4"
+      class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2"
     >
       <div
         class="card h-100 shadow-sm movie-card clickable"
@@ -29,8 +29,8 @@
           loading="lazy"
         />
 
-        <div class="card-body p-2">
-          <h6 class="card-title mb-1 text-truncate" :title="movie.title">
+        <div class="card-body p-2 text-center">
+          <h6 class="card-title mb-1" style="height: 60px" :title="movie.title">
             {{ movie.title }}
           </h6>
           <p class="card-text small text-muted">{{ movie.year }}</p>

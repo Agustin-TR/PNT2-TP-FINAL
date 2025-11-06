@@ -35,7 +35,7 @@
         />
         </div>
 
-        <div v-else-if="movie" class="row">
+        <div v-else-if="movie" class="row border-100 shadow-lg rounded p-4 h-100" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
         <div class="col-md-4 mb-4">
             <img
             :src="posterUrl"
@@ -49,30 +49,38 @@
             <p class="lead text-muted">{{ movie.tagline }}</p>
 
             <hr />
+            <div class="movie-info text-start">
+                <h4 class="fw-semibold mb-2">
+                ⭐ Score:
+                <span :class="scoreBadgeClass">
+                    {{ movie.vote_average.toFixed(1) }}
+                </span>
+                <small class="text-muted">
+                    /10 ({{ movie.vote_count }} votes)
+                </small>
+                </h4>
 
-            <p>
-            Score:
-            <span class="badge bg-warning text-dark">
-                {{ movie.vote_average.toFixed(1) }}
-            </span>
-            / 10 ({{ movie.vote_count }} votes)
-            </p>
+                <h5 class="fw-semibold mb-3">
+                    🎭 Genres:
+                    <span
+                    v-for="genre in movie.genres"
+                    :key="genre.id"
+                    class="badge bg-secondary me-2"
+                    >
+                    {{ genre.name }}
+                    </span>
+                </h5>
 
-            <p>
-            Genres:
-            <span
-                v-for="genre in movie.genres"
-                :key="genre.id"
-                class="badge bg-secondary me-2"
-            >
-                {{ genre.name }}
-            </span>
-            </p>
+                <h5 class="fw-semibold mb-3">
+                    ⏱️ Runtime:
+                    <span class="text-muted">{{ movie.runtime }} min</span>
+                </h5>
 
-            <p>Runtime: {{ movie.runtime }} minutes</p>
-
-            <h2 class="mt-4">Synopsis</h2>
-            <p>{{ movie.overview }}</p>
+                <h4 class="mt-4 mb-2">🎬 Synopsis</h4>
+                <p class="lead" style="line-height: 1.6;">
+                    {{ movie.overview }}
+                </p>
+            </div>
 
             <section class="container">
             <div class="row align-items-center">
@@ -179,7 +187,7 @@
     },
     computed: {
         userId() {
-        return this.authStore.user?.id;
+        return this.authStore.user ? this.authStore.user.id : null;
         },
         releaseYear() {
         return this.movie?.release_date
@@ -190,6 +198,16 @@
         return this.movie?.poster_path
             ? `${BASE_IMAGE_URL}${this.movie.poster_path}`
             : "https://via.placeholder.com/500x750/333/FFFFFF?text=Sin+Poster";
+        },
+        scoreBadgeClass() {
+            const score = this.movie?.vote_average || 0;
+            if (score < 4)
+            return "badge bg-danger text-light"; // 🔴 Red for poor
+            if (score < 7)
+            return "badge bg-warning text-dark"; // 🟡 Yellow for average
+            if (score < 9)
+            return "badge bg-success text-light"; // 🟢 Green for good
+            return "badge bg-gradient text-light";  // 💎 Gradient for amazing
         },
     },
     methods: {
@@ -299,7 +317,10 @@
         width: 50%;
     }
     }
-
+    .card{
+        border-radius: 1px;
+        border-color: black;
+    }
     .text-truncate-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
