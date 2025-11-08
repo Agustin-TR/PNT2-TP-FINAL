@@ -2,29 +2,28 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import Home from "./components/Home.vue";
 import Login from "./components/Login.vue";
-import Registro from "./components/Registro.vue";
+import Signup from "./components/Signup.vue";
 import Watchlist from "./components/Watchlist.vue";
-import PeliculaDetalle from "./components/PeliculaDetalle.vue";
-import Comparar from "./components/Comparar.vue";
-import Favoritos from "./components/Favoritos.vue";
+import Movie from "./components/Movie.vue";
+import Compare from "./components/Compare.vue";
+import Favorites from "./components/Favorites.vue";
+import NotFound from "./components/NotFound.vue";
 
 const routes = [
-    {path: "/", redirect: "/Home" }, // Definicion de ruta root (ruta raiz)
-    {path: "/Home", component: Home},
-    {path: "/Login", component: Login}, 
-    {path: "/Registro", component: Registro},
-    {path: "/Watchlist", component: Watchlist},
-    {path: "/PeliculaDetalle/:id", name: "PeliculaDetalle", component: PeliculaDetalle},
-    {path: "/Comparar", component: Comparar},
-    {path: "/Favoritos", component: Favoritos},
+  { path: "/", component: Home },
+  { path: "/login", component: Login },
+  { path: "/signup", component: Signup },
+  { path: "/watchlist", component: Watchlist },
+  { path: "/movies/:id", name: "Movie", component: Movie },
+  { path: "/compare", component: Compare },
+  { path: "/favorites", component: Favorites },
 
-  //Definicion del comportamiento del router ante rutas no existentes
-  { path: "/:pathmatch", redirect: "/Home" },
+  { path: "/:pathmatch(.*)*", component: NotFound },
 ];
 
 const router = createRouter({
-    history: createWebHistory(), // vincula el historial de navegacion en el modo que queremos ()
-    routes: routes,
+  history: createWebHistory(), //
+  routes: routes,
 });
 
 export default router;

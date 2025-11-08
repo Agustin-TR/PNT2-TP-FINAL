@@ -47,19 +47,6 @@ class FavoritesService {
     return true;
   };
 
-  isInFavs = async (userId, movieId) => {
-    try {
-      const user = findUser(userId);
-      if (!user) return false;
-      
-      const idStr = String(movieId);
-      return user.favorites.some((f) => f.movieId === idStr);
-    } catch (error) {
-      console.error('Error checking if movie is in favorites:', error);
-      return false;
-    }
-  };
-
   setRating = async (userId, movieId, rating) => {
     const user = findUser(userId);
     if (!user) throw new Error("User not found.");

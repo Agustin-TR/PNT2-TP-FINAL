@@ -47,14 +47,15 @@
             @click.stop="toggleFavs(movie.id)"
           >
             {{ isFavorite(movie.id) ? "⭐" : "+☆" }}
+
           </button>
 
           <button
             class="btn btn-sm w-100"
-            :class="isAdded(movieId) ? 'btn-success' : 'btn-primary'"
+            :class="isAdded(movie.id) ? 'btn-success' : 'btn-primary'"
             @click.stop="toggleWatchlist(movie.id)"
           >
-            {{ isAdded(movieId) ? "✅ In Watchlist" : "+ Watchlist" }}
+            {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
           </button>
         </div>
 

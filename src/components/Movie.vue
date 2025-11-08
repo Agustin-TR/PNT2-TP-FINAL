@@ -292,35 +292,6 @@
             }
         },
 
-        /*async toggleFavs(movieId){
-            const movieIdStr = String(movieId);
-
-            if (!this.userId) {
-                alert("Please log in to add items to your favorites.");
-                return;
-            }
-
-            try {
-                const currentlyInList = await FavoritesService.isInFavs(this.userId,movieIdStr);
-
-                if (currentlyInList) {
-                const newFav = await FavoritesService.deleteFromFavorites(
-                    this.userId,
-                    movieIdStr
-                );
-                this.favorites = newFav.map(String);
-                this.isInFavs = false;
-                } else {
-                await FavoritesService.addToFavorites(this.userId, movieIdStr);
-                this.favorites.push(movieIdStr);
-                this.isInFavs = true;
-                }
-            } catch (error) {
-                console.error(`Error toggling favorites for movie ${movieId}:`, error);
-                alert(`Could not update favorites: ${error.message}`);
-            }
-        }*/
-
         async toggleFavs(movieId) {
       
             if (!this.userId) {
@@ -358,10 +329,11 @@
         await this.fetchMovieReviews();
 
         if (this.userId && this.movie?.id) {
-            this.isInWatchlist = await WatchlistService.isInWatchlist(
-                this.userId,
-                String(this.movie.id)
-            );
+
+        this.isInWatchlist = await WatchlistService.isInWatchlist(
+            this.userId,
+            String(this.movie.id)
+        );
         }
     },
     };
