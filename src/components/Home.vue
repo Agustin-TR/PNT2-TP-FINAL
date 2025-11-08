@@ -1,6 +1,11 @@
 <template>
   <h1 class="mb-4 text-center">Popular this week</h1>
 
+  <button :disabled="!isSelectionFull()"
+  class="btn btn-lg btn-primary mt-3 ms-auto d-block mb-3" @click="goToCompare()"
+  > Compare
+  </button>
+
   <div v-if="loading" class="text-center my-5">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -52,6 +57,20 @@
             {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
           </button>
         </div>
+
+        <!-- ✅ Checkbox al final -->
+        <div class="form-check mt-auto text-center">
+          <input
+            class="form-check-input position-absolute top-0 end-0 m-2"
+            type="checkbox"
+            :id="'checkbox-' + movie.id"
+            v-model="movie.selected"
+            @change="isSelectionFull()"
+            :disabled="isCheckboxDisabled(movie)"
+            @click.stop
+          />
+          </div>
+
       </div>
     </div>
   </div>
@@ -76,11 +95,7 @@ const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
 export default {
   name: "Home",
-  // Setup is used to access the Pinia store in the Options API
-  setup() {
-    const authStore = useAuthStore();
-    return { authStore };
-  },
+
   data() {
     return {
       movies: [],
@@ -89,6 +104,10 @@ export default {
       favorites: [],
       loading: true,
       error: null,
+      authStore: useAuthStore(),
+      selectedMovies: [],
+      selectedCount: 0,
+      selectionMax: 3,
     };
   },
   computed: {
@@ -103,6 +122,19 @@ export default {
   methods: {
     goToWatchlist() {
       this.$router.push("/watchlist");
+    },
+    //checkbox
+    isCheckboxDisabled(movie) {
+    this.selectedCount = this.movies.filter(m => m.selected).length;
+    return this.isSelectionFull() && !movie.selected;
+    },
+    isSelectionFull(){
+      return this.selectedCount >= this.selectionMax
+    },
+    goToCompare(){
+      this.selectedMovies = this.movies.filter(m => m.selected);
+      this.authStore.setSelectedMovies(this.selectedMovies);
+      this.$router.push({ path: '/compare' });
     },
     /**
      * Fetches the user's current watchlist from the service.
