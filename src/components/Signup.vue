@@ -60,6 +60,33 @@
               </div>
 
               <div class="mb-4">
+                <div class="form-group">
+                  <label for="age" class="form-label fw-bold">Age</label>
+                  <input
+                    type="number"
+                    id="age"
+                    class="form-control form-control-lg"
+                    :class="{
+                      'is-invalid': ageError.show,
+                      'is-valid': formDirty.age && ageError.isValid,
+                    }"
+                    v-model.trim="formData.age"
+                    @input="formDirty.age = true"
+                    placeholder="e.g., 30"
+                  />
+                  <div v-if="ageError.show" class="invalid-feedback">
+                    {{ ageError.message }}
+                  </div>
+                  <div
+                    v-if="formDirty.age && ageError.isValid"
+                    class="valid-feedback"
+                  >
+                    Looks good!
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-4">
                 <label for="email" class="form-label fw-bold">Email</label>
                 <input
                   type="email"
@@ -157,6 +184,8 @@ export default {
       maxNameChars: 15,
       minLastNameChars: 2,
       maxLastNameChars: 20,
+      minAge: 0,
+      maxAge: 120,
       error: "",
       isLoading: false,
     };
@@ -168,6 +197,7 @@ export default {
         lastName: null,
         email: "",
         password: null,
+        age: null,
       };
     },
     async send() {
@@ -272,6 +302,33 @@ export default {
         isValid: msg === "",
       };
     },
+    isValidAge() {
+      const age = this.formData.age;
+      return (
+        Number.isInteger(Number(age)) &&
+        age >= this.minAge &&
+        age <= this.maxAge
+      );
+    },
+    ageError() {
+      let msg = "";
+      const age = this.formData.age;
+
+      if (age === null || age === "") {
+        msg = "This field is required";
+      } else if (!Number.isInteger(Number(age))) {
+        msg = "Age must be a valid integer";
+      } else if (age < this.minAge || age > this.maxAge) {
+        msg = `Age must be between ${this.minAge} and ${this.maxAge}`;
+      }
+
+      return {
+        message: msg,
+        show: msg !== "" && this.formDirty.age,
+        isValid: msg === "",
+      };
+    },
+
     canSend() {
       return (
         this.firstNameError.isValid &&

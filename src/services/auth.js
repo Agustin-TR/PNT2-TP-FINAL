@@ -1,46 +1,70 @@
+import axios from "axios";
 import { getUsers, findUserByEmail, saveUser } from "./db";
 
-let nextId = 7; 
+const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+const PREFIX = URL + "/users";
+
+let nextId = 7;
 
 class AuthService {
-  login = async (email, password) => {
+  login = async (email, password, rememberMe) => {
     console.log("Trying to log in user with email and password:", {
       email,
       password,
+      rememberMe,
     });
-    const user = findUserByEmail(email);
-    console.log("Found user:", user);
-    if (!user) {
-      throw new Error("User not found.");
-    }
-    if (user.password === password) {
-      return user;
-    } else {
-      throw new Error("Incorrect password.");
+
+    try {
+      const { data } = await axios.post(`${PREFIX}/login`, {
+        email,
+        password,
+        rememberMe,
+      });
+      const storage = rememberMe ? localStorage : sessionStorage;
+      const other = rememberMe ? sessionStorage : localStorage;
+
+      storage.setItem("token", data.token);
+      storage.setItem("user", JSON.stringify(data.user));
+      other.removeItem("token");
+      other.removeItem("user");
+      return data.user;
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Login failed.";
+      throw new Error(msg);
     }
   };
 
   register = async ({ firstName, lastName, email, password }) => {
-
-    console.log("Registering user with data:", { firstName, lastName, email, password });
-
-    if (findUserByEmail(email)) {
-      throw new Error("Email is already registered.");
-    }
-
-    const newUser = {
-      id: nextId++, // Use and then increment nextId
+    console.log("Registering user with data:", {
       firstName,
       lastName,
       email,
       password,
-      favorites: [],
-      watchlist: [],
+    });
+
+    const body = {
+      firstName,
+      lastName,
+      email,
+      password,
+      age,
     };
 
-    // Save through the DB layer
-    saveUser(newUser);
-    return newUser;
+    try {
+      const response = await axios.post(`${PREFIX}/register`, body);
+
+      return response.data;
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Registration failed.";
+      throw new Error(msg);
+    }
   };
 }
 
