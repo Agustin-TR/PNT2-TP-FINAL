@@ -7,6 +7,7 @@ import Watchlist from "./components/Watchlist.vue";
 import Movie from "./components/Movie.vue";
 import Compare from "./components/Compare.vue";
 import Favorites from "./components/Favorites.vue";
+import Profile from "./components/Profile.vue";
 import NotFound from "./components/NotFound.vue";
 
 const routes = [
@@ -17,6 +18,7 @@ const routes = [
   { path: "/movies/:id", name: "Movie", component: Movie },
   { path: "/compare", component: Compare },
   { path: "/favorites", component: Favorites },
+  { path: "/profile", component: Profile },
 
   { path: "/:pathmatch(.*)*", component: NotFound },
 ];

@@ -41,6 +41,21 @@
                 />
               </div>
 
+              <div class="mb-4">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="rememberMe"
+                    v-model="formData.rememberMe"
+                  />
+                  <label class="form-check-label" for="rememberMe">
+                    Remember me?
+                  </label>
+                </div>
+              </div>
+
               <div v-if="errorMessage" class="alert alert-danger">
                 {{ errorMessage }}
               </div>
@@ -92,6 +107,7 @@ export default {
       return {
         password: null,
         email: "",
+        rememberMe: false,
       };
     },
     async submit() {
@@ -110,17 +126,15 @@ export default {
       try {
         const user = await authService.login(
           submitted.email,
-          submitted.password
+          submitted.password,
+          submitted.rememberMe
         );
 
         authStore.login(user);
         this.$router.push("/");
       } catch (error) {
-        console.error("Login failed:", error);
         this.errorMessage = error.message || "Login failed. Please try again.";
       }
-
-      console.log("Form Submitted:", submitted);
     },
     submissionEntries() {
       return Object.keys(this.submittedData).length === 0
