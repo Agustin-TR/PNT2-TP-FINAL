@@ -38,13 +38,14 @@ class AuthService {
     }
   };
 
-  register = async ({ firstName, lastName, username, email, password }) => {
+  register = async ({ firstName, lastName, username, email, password, age }) => {
     console.log("Registering user with data:", {
       firstName,
       lastName,
       username,
       email,
       password,
+      age
     });
 
     const body = {
