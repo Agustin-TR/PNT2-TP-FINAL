@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getUsers, findUserByEmail, saveUser } from "./db";
+import { validateToken } from "@/utils/user";
 
 const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -38,14 +39,21 @@ class AuthService {
     }
   };
 
-  register = async ({ firstName, lastName, username, email, password, age }) => {
+  register = async ({
+    firstName,
+    lastName,
+    username,
+    email,
+    password,
+    age,
+  }) => {
     console.log("Registering user with data:", {
       firstName,
       lastName,
       username,
       email,
       password,
-      age
+      age,
     });
 
     const body = {
@@ -67,6 +75,64 @@ class AuthService {
         error.response?.data?.error ||
         error.response?.data?.message ||
         "Registration failed.";
+      throw new Error(msg);
+    }
+  };
+
+  loadAccount = async () => {
+    const token = validateToken();
+    try {
+      const { data } = await axios.get(`${PREFIX}/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to load profile.";
+      throw new Error(msg);
+    }
+  };
+
+  updateAccount = async (profileData) => {
+    const token = validateToken();
+
+    try {
+      console.log("Updating profile with data:", profileData);
+      const { data } = await axios.put(`${PREFIX}/`, profileData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Profile updated successfully:", data);
+      return data;
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to update profile.";
+      throw new Error(msg);
+    }
+  };
+
+  deleteAccount = async () => {
+    const token = validateToken();
+
+    try {
+      const response = await axios.delete(`${PREFIX}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response)
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to delete profile.";
       throw new Error(msg);
     }
   };
