@@ -38,10 +38,11 @@ class AuthService {
     }
   };
 
-  register = async ({ firstName, lastName, email, password }) => {
+  register = async ({ firstName, lastName, username, email, password }) => {
     console.log("Registering user with data:", {
       firstName,
       lastName,
+      username,
       email,
       password,
     });
@@ -49,6 +50,7 @@ class AuthService {
     const body = {
       firstName,
       lastName,
+      username,
       email,
       password,
       age,
@@ -56,6 +58,7 @@ class AuthService {
 
     try {
       const response = await axios.post(`${PREFIX}/register`, body);
+      console.log("Registration response:", response);
 
       return response.data;
     } catch (error) {

@@ -59,6 +59,33 @@
                 </div>
               </div>
 
+               <div class="mb-4">
+                <label for="username" class="form-label fw-bold"
+                  >Username</label
+                >
+                <input
+                  type="text"
+                  id="username"
+                  class="form-control form-control-lg"
+                  :class="{
+                    'is-invalid': userNameError.show,
+                    'is-valid': formDirty.username && userNameError.isValid,
+                  }"
+                  v-model.trim="formData.username"
+                  @input="formDirty.username = true"
+                  placeholder="e.g., johndoe123"
+                />
+                <div v-if="userNameError.show" class="invalid-feedback">
+                  {{ userNameError.message }}
+                </div>
+                <div
+                  v-if="formDirty.username && userNameError.isValid"
+                  class="valid-feedback"
+                >
+                  Looks good!
+                </div>
+              </div>
+
               <div class="mb-4">
                 <div class="form-group">
                   <label for="age" class="form-label fw-bold">Age</label>
@@ -180,10 +207,8 @@ export default {
       formData: this.getInputs(),
       formDirty: this.getInputs(),
       submittedData: {},
-      minNameChars: 5,
-      maxNameChars: 15,
-      minLastNameChars: 2,
-      maxLastNameChars: 20,
+      minChars: 5,
+      maxChars: 50,
       minAge: 0,
       maxAge: 120,
       error: "",
@@ -195,6 +220,7 @@ export default {
       return {
         firstName: null,
         lastName: null,
+        username: null,
         email: "",
         password: null,
         age: null,
@@ -236,10 +262,10 @@ export default {
       let msg = "";
       const firstName = this.formData.firstName;
       if (!firstName) msg = "This field is required";
-      else if (firstName.length < this.minNameChars)
-        msg = `The firstName must be at least ${this.minNameChars} characters`;
-      else if (firstName.length > this.maxNameChars)
-        msg = `The firstName cannot exceed ${this.maxNameChars} characters`;
+      else if (firstName.length < this.minChars)
+        msg = `The first name must be at least ${this.minChars} characters`;
+      else if (firstName.length > this.maxChars)
+        msg = `The first name cannot exceed ${this.maxChars} characters`;
 
       return {
         message: msg,
@@ -251,10 +277,10 @@ export default {
       let msg = "";
       const lastName = this.formData.lastName;
       if (!lastName) msg = "This field is required";
-      else if (lastName.length < this.minLastNameChars)
-        msg = `The last name must be at least ${this.minLastNameChars} characters`;
-      else if (lastName.length > this.maxLastNameChars)
-        msg = `The last name cannot exceed ${this.maxLastNameChars} characters`;
+      else if (lastName.length < this.minChars)
+        msg = `The last name must be at least ${this.minChars} characters`;
+      else if (lastName.length > this.maxChars)
+        msg = `The last name cannot exceed ${this.maxChars} characters`;
 
       return {
         message: msg,
@@ -286,11 +312,6 @@ export default {
         isValid: msg === "",
       };
     },
-    isValidEmail() {
-      const email = this.formData.email;
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
-    },
     emailError() {
       let msg = "";
       if (!this.formData.email) msg = "This field is required";
@@ -301,14 +322,6 @@ export default {
         show: msg !== "" && this.formDirty.email,
         isValid: msg === "",
       };
-    },
-    isValidAge() {
-      const age = this.formData.age;
-      return (
-        Number.isInteger(Number(age)) &&
-        age >= this.minAge &&
-        age <= this.maxAge
-      );
     },
     ageError() {
       let msg = "";
@@ -327,6 +340,34 @@ export default {
         show: msg !== "" && this.formDirty.age,
         isValid: msg === "",
       };
+    },
+    userNameError() {
+      let msg = "";
+      const username = this.formData.username;
+      if (!username) msg = "This field is required";
+      else if (username.length < this.minChars)
+        msg = `The username must be at least ${this.minChars} characters`;
+      else if (username.length > this.maxChars)
+        msg = `The username cannot exceed ${this.maxChars} characters`;
+
+      return {
+        message: msg,
+        show: msg !== "" && this.formDirty.username,
+        isValid: msg === "",
+      };
+    },
+    isValidEmail() {
+      const email = this.formData.email;
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return regex.test(email);
+    },
+    isValidAge() {
+      const age = this.formData.age;
+      return (
+        Number.isInteger(Number(age)) &&
+        age >= this.minAge &&
+        age <= this.maxAge
+      );
     },
 
     canSend() {
