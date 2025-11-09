@@ -18,13 +18,25 @@ class WatchlistService {
 
     setWatchItem(user, idStr);
     return true;
-  };
+};
+
+isInWatchlist = async (userId, movieId) => {
+        const user = findUser(userId);
+        if (!user) throw new Error("User not found.");
+
+        const idStr = String(movieId);
+        if (!user.watchlist.includes(idStr)) {
+            return false;
+        } else {
+            return true;
+        }
+    };
 
   removeFromWatchlist = async (userId, movieId) => {
     const user = findUser(userId);
     if (!user) throw new Error("User not found.");
-
     const idStr = String(movieId);
+
     const index = user.watchlist.findIndex((id) => id === idStr);
 
     if (index === -1) {

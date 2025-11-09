@@ -1,60 +1,51 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-lg d-flex flex-column align-items-center">
-      <div class="d-flex justify-content-between align-items-center w-100">
-        <RouterLink class="navbar-brand pelli-logo" to="/">Pelli</RouterLink>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 py-2 sticky-top">
+    <div class="container-fluid d-flex align-items-center flex-nowrap p-0">
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+      <RouterLink class="navbar-brand pelli-logo fs-3 fw-bold text-warning px-3 me-0 flex-shrink-0" to="/">Peli</RouterLink>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto mb-lg-0 align-items-center">
-            <template v-if="!isAuthenticated">
-              <li class="nav-item">
-                <RouterLink class="nav-link" to="/login">Login</RouterLink>
-              </li>
-              <li class="nav-item">
-                <RouterLink class="nav-link" to="/signup">Sign Up</RouterLink>
-              </li>
-            </template>
-
-            <template v-else>
-              <li class="nav-item">
-                <RouterLink class="nav-link" to="/films">Films</RouterLink>
-              </li>
-              <li class="nav-item">
-                <RouterLink class="nav-link" to="/lists">Lists</RouterLink>
-              </li>
-              <li class="nav-item">
-                <RouterLink class="nav-link" to="/favorites"
-                  >Favorites</RouterLink
-                >
-              </li>
-              <li class="nav-item">
-                <RouterLink class="nav-link" to="/profile">
-                  Hi, {{ user?.firstName || "User" }}
-                </RouterLink>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" @click.prevent="handleLogout"
-                  >Logout</a
-                >
-              </li>
-            </template>
-            </ul>
-        </div>
+      <div class="searcher-wrapper flex-grow-1 mx-2">
+        <Searcher />
       </div>
 
-      <Searcher />
+      <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse"
+        data-bs-target="#collapsibleNavbar" aria-controls="collapsibleNavbar" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse flex-grow-0" id="collapsibleNavbar">
+
+        <ul class="navbar-nav ms-auto flex-md-row flex-column align-items-md-center align-items-start px-4">
+
+          <template v-if="!isAuthenticated">
+            <li class="nav-item">
+              <RouterLink class="nav-link text-nowrap text-white me-2" to="/login">Login</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link text-nowrap text-white me-2" to="/signup">Sign Up</RouterLink>
+            </li>
+          </template>
+
+          <template v-else>
+            <li class="nav-item">
+              <a class="nav-link text-nowrap text-white me-2" to="#">Hi, {{ user?.firstName || "User" }}</a>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link text-nowrap text-white me-2" to="/favorites">Favorites</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link text-nowrap text-white me-2" to="/watchlist">Watchlist</RouterLink>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link text-nowrap text-white me-2" href="#" @click.prevent="handleLogout">Logout</a>
+            </li>
+            
+          </template>
+
+        </ul>
+      </div>
+
     </div>
   </nav>
 </template>
@@ -87,7 +78,4 @@ export default {
 </script>
 
 <style scoped>
-.nav-link {
-  cursor: pointer;
-}
 </style>

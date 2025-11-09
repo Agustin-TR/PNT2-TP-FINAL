@@ -8,6 +8,7 @@ import Movie from "./components/Movie.vue";
 import Compare from "./components/Compare.vue";
 import Favorites from "./components/Favorites.vue";
 import Profile from "./components/Profile.vue";
+import NotFound from "./components/NotFound.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -19,8 +20,7 @@ const routes = [
   { path: "/favorites", component: Favorites },
   { path: "/profile", component: Profile },
 
-  // Redirect to home for any unmatched routes
-  { path: "/:pathmatch", redirect: "/" },
+  { path: "/:pathmatch(.*)*", component: NotFound },
 ];
 
 const router = createRouter({
