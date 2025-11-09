@@ -4,23 +4,23 @@ export const useAuthStore = defineStore("auth", {
   state: () => {
     const token =
       sessionStorage.getItem("token") || localStorage.getItem("token");
-    const user =
-      sessionStorage.getItem("user")
-        ? JSON.parse(sessionStorage.getItem("user"))
-        : localStorage.getItem("user")
-        ? JSON.parse(localStorage.getItem("user"))
-        : null;
-    
-     const selectedMovies = [];
+    const user = sessionStorage.getItem("user")
+      ? JSON.parse(sessionStorage.getItem("user"))
+      : localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+
+    const selectedMovies = [];
 
     return {
       token,
       user,
       isAuthenticated: !!token,
-      selectedMovies
+      selectedMovies,
     };
+  },
   getters: {
-    getSelectedMovies: state => state.selectedMovies
+    getSelectedMovies: (state) => state.selectedMovies,
   },
   actions: {
     login(userData) {
