@@ -29,7 +29,7 @@
 
           <template v-else>
             <li class="nav-item">
-              <a class="nav-link text-nowrap text-white me-2" to="#">Hi, {{ user?.firstName || "User" }}</a>
+              <RouterLink class="nav-link text-nowrap text-white me-2" to="/profile">Hi, {{ user?.firstName || "User" }}</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link text-nowrap text-white me-2" to="/favorites">Favorites</RouterLink>
