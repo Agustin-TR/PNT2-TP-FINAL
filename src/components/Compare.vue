@@ -11,9 +11,9 @@
         </div>
 
         <div v-else-if="selectedMovies.length" class="d-flex flex-wrap gap-3 justify-content-center">
-            <div v-for="(movie, index) in selectedMovies" :key="index" class="card shadow-sm" style="width: 300px">
-                <img :src="getPosterUrl(movie.poster_path)" class="card-img-top" :alt="movie.title"
-                    style="height: 450px; object-fit: cover" />
+            <div v-for="(movie, index) in selectedMovies" :key="index" class="card shadow-sm w-25 mb-5">
+                <img :src="getPosterUrl(movie.poster_path)" class="card-img-top object-fit-cover h-100" :alt="movie.title"
+                />
                 <div class="card-body">
                     <h5 class="card-title">{{ movie.title }} ({{ getYear(movie.release_date) }})</h5>
                     <p class="card-text text-muted">{{ movie.tagline || 'No tagline available.' }}</p>
