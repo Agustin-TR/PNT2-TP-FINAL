@@ -8,7 +8,6 @@
 
         <div v-else-if="error" class="alert alert-danger text-center">
             <span>{{ error }}</span> -
-            <router-link to="/" class="text-dark fw-bold text-decoration-none">Go home</router-link>
         </div>
 
         <div v-else-if="selectedMovies.length" class="d-flex flex-wrap gap-3 justify-content-center">
@@ -36,6 +35,7 @@
 
         <div v-else class="alert alert-info text-center">
             No movies selected for comparison.
+             <router-link to="/" class="text-dark fw-bold text-decoration-none">Go home</router-link>
         </div>
     </div>
 </template>
