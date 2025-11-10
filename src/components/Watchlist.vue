@@ -86,7 +86,7 @@
                                 :class="['btn', 'btn-sm', 'me-2', favoritesStore.isFavorite(movie.id) ? 'btn-warning' : 'btn-outline-warning']"
                                 :title="favoritesStore.isFavorite(movie.id) ? 'Remove from Favorites' : 'Add to Favorites'"
                             >
-                                {{ favoritesStore.isFavorite(movie.id) ? '⭐' : '+☆' }}
+                                {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡"}}
                             </button>
                             <button @click="removeItem(movie.id)" class="btn btn-sm btn-outline-danger" title="Remove from Watchlist">
                                 <i class="bi bi-trash"></i>

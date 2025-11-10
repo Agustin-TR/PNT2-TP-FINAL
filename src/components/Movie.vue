@@ -98,7 +98,7 @@
                         :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'" 
                         @click.stop="toggleFavs(movie.id)"
                     >
-                        {{ favoritesStore.isFavorite(movie.id) ? "⭐" : "+☆" }}
+                        {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
                     </button>
                 </div>
                 <div class="col-4">
