@@ -9,11 +9,9 @@ export const saveUser = (newUser) => {
 };
 
 export const setFavorite = (user, newFavorite) => {
-  if (user && user.favorites) {
-    user.favorites.push(newFavorite);
-    console.log("Favorite added");
-  }
-};
+  user.favorites.push(newFavorite);
+  console.log("Favorite added");
+}
 
 export const deleteFavorite = (user, index) => {
   if (user && user.favorites && index >= 0 && index < user.favorites.length) {
@@ -22,11 +20,35 @@ export const deleteFavorite = (user, index) => {
   }
 };
 
-export const setRatingDB = (favorite, rating) => {
+/*export const setRatingDB = (favorite, rating) => {
   if (favorite) {
     favorite.rating = rating;
     console.log("Rating added");
   }
+};*/
+
+export const setRatingDB = (user, movieId, rating) => {
+  if (!user) return;
+  if (rating < 1 || rating > 5) {
+    console.error("Rating must be between 1 and 5");
+    return;
+  }
+
+  const existingRating = user.ratings.find(r => r.movieId === movieId);
+
+  if (existingRating) {
+    // Actualizar rating existente
+    existingRating.rating = rating;
+    console.log("Rating updated");
+  } else {
+    // Agregar nuevo rating
+    user.ratings.push({
+      movieId: movieId,
+      rating: rating
+    });
+    console.log("Rating added");
+  }  
+
 };
 
 export const deleteRatingDB = (favorite) => {
@@ -36,11 +58,34 @@ export const deleteRatingDB = (favorite) => {
   }
 };
 
-export const setComment = (favorite, comment) => {
+/*export const setComment = (favorite, comment) => {
   if (favorite) {
     favorite.comment = comment;
     console.log("Comment added");
   }
+};*/
+
+export const setComment = (user, movieId, commentText) => {
+  if (!user) return;
+
+  // Buscar si ya existe un comentario para esta película
+  const existingComment = user.comments.find(c => c.movieId === movieId);
+
+  if (existingComment) {
+    // Actualizar comentario existente
+    existingComment.comment = commentText.trim();
+    existingComment.updated_at = new Date().toISOString();
+    console.log("Comment updated");
+  } else {
+    // Agregar nuevo comentario
+    user.comments.push({
+      movieId: movieId,
+      comment: commentText.trim(),
+      created_at: new Date().toISOString()
+    });
+    console.log("Comment added");
+  }  
+
 };
 
 export const deleteComment = (favorite) => {

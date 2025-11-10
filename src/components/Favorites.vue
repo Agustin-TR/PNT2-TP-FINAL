@@ -1,4 +1,3 @@
-
 <template>
     <div class="container mt-5">
         <h2 class="mb-4">⭐ My Favorites</h2>
@@ -8,10 +7,10 @@
         </div>
 
         <div v-else-if="loading" class="alert alert-info" role="alert">
-        <div class="spinner-border spinner-border-sm me-2" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        Loading Favorites...
+            <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            Loading Favorites...
         </div>
 
         <div v-else-if="favoritesWithDetails.length === 0" class="alert alert-secondary" role="alert">
@@ -58,40 +57,39 @@
                 <tbody>
                     <tr v-for="(movie, index) in sortedFavorites" :key="movie.id">
                         <th scope="row">{{ index + 1 }}</th>
-                        <!-- 🔹 Clickable title that redirects -->
                         <td>
                             <span class="movie-title" @click="goToMovie(movie.id)">
                                 <strong>{{ movie.title }}</strong>
                             </span>
                         </td>
-                         <td class="text-muted small">{{ movie.tagline || 'N/A' }}</td>
-                         <td class="text-center">
+                        <td class="text-muted small">{{ movie.tagline || 'N/A' }}</td>
+                        <td class="text-center">
                             <span class="badge bg-warning text-dark">{{ formatRating(movie.vote_average) }}</span>
-                         </td>
-                         <td>{{ formatDate(movie.release_date) }}</td>
-                         <td class="text-center">{{ movie.runtime }} min</td>
-                         <td>{{ formatGenres(movie.genres) }}</td>
+                        </td>
+                        <td>{{ formatDate(movie.release_date) }}</td>
+                        <td class="text-center">{{ movie.runtime }} min</td>
+                        <td>{{ formatGenres(movie.genres) }}</td>
 
                         <td class="text-center">
-                           <img
-                               :src="getPosterUrl(movie.poster_path)"
-                               :alt="`Poster for ${movie.title}`"
-                               class="poster-thumbnail"
-                               @click="showPosterModal(movie.poster_path)"
-                               loading="lazy"
-                           />   
+                            <img
+                                :src="getPosterUrl(movie.poster_path)"
+                                :alt="`Poster for ${movie.title}`"
+                                class="poster-thumbnail"
+                                @click="showPosterModal(movie.poster_path)"
+                                loading="lazy"
+                            />   
                         </td>
                         <td class="text-center text-nowrap">
-                           <button 
-                               @click="deleteFav(movie.id)" 
-                               class="btn btn-sm btn-outline-danger"
-                               title="Remove from Favorites"
-                           >
-                           <i class="bi bi-trash"></i>
-                           </button>                                  
+                            <button 
+                                @click="deleteFav(movie.id)" 
+                                class="btn btn-sm btn-outline-danger"
+                                title="Remove from Favorites"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>                                  
                         </td>
                     </tr>
-            </tbody>
+                </tbody>
             </table>
         </div>
 
@@ -101,10 +99,10 @@
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
                 <div class="modal-content">
                     <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" aria-label="Close" @click="hidePosterModal"></button>
+                        <button type="button" class="btn-close" aria-label="Close" @click="hidePosterModal"></button>
                     </div>
                     <div class="modal-body pt-0 text-center custom-modal-body">
-                    <img :src="modalPosterUrl" class="img-fluid rounded" alt="Large Movie Poster" />
+                        <img :src="modalPosterUrl" class="img-fluid rounded" alt="Large Movie Poster" />
                     </div>
                 </div>
             </div>
@@ -112,46 +110,58 @@
     </div>
 </template>
 
-<script scoped>
-    import { useAuthStore } from "@/stores/authStore";
-    import movieService from "@/services/movies";
-    import FavoritesService from "@/services/favorites"; 
+<script>
+import { useAuthStore } from "@/stores/authStore";
+import { useFavoritesStore } from "@/stores/favoritesStore"; // ✅ Importar
+import movieService from "@/services/movies";
 
-    const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL || 'https://image.tmdb.org/t/p/w200';
+const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL || 'https://image.tmdb.org/t/p/w200';
 
-    export default {
-        name: 'Favorites',
-        data() {
-            return {
-                favorites: [],
-                favoritesWithDetails: [],
-                loading: false,
-                error: null,
-                sortByField: 'vote_average',
-                sortDirection: 'desc',
-                showModal: false,
-                modalPosterUrl: ''
-            };
+export default {
+    name: 'Favorites',
+    
+    data() {
+        return {
+            favoritesWithDetails: [],
+            loading: false,
+            error: null,
+            sortByField: 'vote_average',
+            sortDirection: 'desc',
+            showModal: false,
+            modalPosterUrl: ''
+        };
+    },
+
+    computed: {
+        authStore() {
+            return useAuthStore();
+        },
+        
+        // ✅ NUEVO: Acceso al store de favoritos
+        favoritesStore() {
+            return useFavoritesStore();
+        },
+        
+        isAuthenticated() {
+            return this.authStore.isAuthenticated;
+        },
+        
+        userId() {
+            return this.authStore.user ? this.authStore.user.id : null;
         },
 
-        computed: {
-            authStore() {
-                return useAuthStore();
-            },
-            isAuthenticated() {
-                return this.authStore.isAuthenticated;
-            },
-            userId() {
-                return this.authStore.user ? this.authStore.user.id : null;
-            },
- 
-            sortedFavorites() {
-                if (this.favoritesWithDetails.length === 0) return [];
-                const sorted = [...this.favoritesWithDetails];
-                const field = this.sortByField;
-                const direction = this.sortDirection === 'asc' ? 1 : -1;
-            
-                return sorted.sort((a, b) => {
+        // ✅ Usar favoritos del store en lugar de data local
+        favorites() {
+            return this.favoritesStore.favorites;
+        },
+        
+        sortedFavorites() {
+            if (this.favoritesWithDetails.length === 0) return [];
+            const sorted = [...this.favoritesWithDetails];
+            const field = this.sortByField;
+            const direction = this.sortDirection === 'asc' ? 1 : -1;
+        
+            return sorted.sort((a, b) => {
                 let aValue = a[field];
                 let bValue = b[field];
                 
@@ -168,157 +178,172 @@
                 return 0;
             });
         }            
+    },
 
-        },
-        methods: {
-            async loadFavorites() {
-                if(!this.userId){
-                    this.$router.push('/login');
+    methods: {
+        async loadFavorites() {
+            if (!this.userId) {
+                this.$router.push('/login');
+                return;
+            }
+            
+            this.loading = true;
+            this.error = null;
+            
+            try {
+                // ✅ Cargar favoritos desde el store (esto actualiza favoritesStore.favorites)
+                await this.favoritesStore.loadFavorites(this.userId);
+                
+                // Si no hay favoritos, vaciar detalles
+                if (this.favorites.length === 0) {
+                    this.favoritesWithDetails = [];
                     return;
                 }
-                this.loading = true;
-                this.error = null;
-                
-                try {
-                    this.favorites = await FavoritesService.getAllFavorites(this.userId);
-                    if (this.favorites.length === 0) {
-                        this.favoritesWithDetails = [];
-                        return;
+
+                // Obtener detalles de cada película
+                const detailsPromises = this.favorites.map(async (fav) => {
+                    try {
+                        const movieData = await movieService.getMovieDetails(fav.movieId);
+
+                        return {
+                            id: fav.movieId,
+                            title: movieData.title,
+                            year: movieData.release_date?.split('-')[0] || 'N/A',
+                            poster_path: movieData.poster_path,
+                            vote_average: movieData.vote_average,
+                            genres: movieData.genres,
+                            runtime: movieData.runtime,
+                            release_date: movieData.release_date,
+                            tagline: movieData.tagline,
+                            comment: fav.comment,  
+                            rating: fav.rating      
+                        };
+                    } catch (err) {
+                        console.error(`Error cargando película ${fav.movieId}:`, err);
+                        return null;
                     }
+                });
 
-                    const detailsPromises = this.favorites.map(async (fav) =>{
-                        try{
-                            const movieData = await movieService.getMovieDetails(fav.movieId);
+                const movies = await Promise.allSettled(detailsPromises);
+                this.favoritesWithDetails = movies
+                    .filter(r => r.status === 'fulfilled' && r.value)
+                    .map(r => r.value);
+                    
+                console.log('Favoritos con detalles:', this.favoritesWithDetails);
 
-                            return {
-                                id: fav.movieId,
-                                title: movieData.title,
-                                year: movieData.release_date?.split('-')[0] || 'N/A',
-                                poster_path: movieData.poster_path,
-                                vote_average: movieData.vote_average,
-                                genres: movieData.genres,
-                                runtime: movieData.runtime,
-                                release_date: movieData.release_date,
-                                tagline: movieData.tagline,
-                                comment: fav.comment,  
-                                rating: fav.rating      
-                            };
-                        }catch (err){
-                            console.error(`Error cargando pelicula ${fav.movieId}:`, err);
-                            return null;
-                        }
-                    });
+            } catch (err) {
+                this.error = 'Error al cargar favoritos: ' + err.message;
+                console.error(err);
+            } finally {
+                this.loading = false;
+            }
+        },
 
-                    const movies = await Promise.allSettled(detailsPromises);
-                    this.favoritesWithDetails = movies
-                        .filter(r => r.status === 'fulfilled' && r.value)
-                        .map(r => r.value);
-                    console.log('Favoritos con detalles: ' , this.favoritesWithDetails);
-
-                } catch (err) {
-                    this.error = 'Error al cargar favoritos: ' + err.message;
-                    console.error(err);
-                } finally {
-                    this.loading = false;
-                }
-            },
-
-            async deleteFav(movieId){
-                if (!confirm('Are you sure you want to remove this movie from favorites?')) {
-                    return;
-                }
+        async deleteFav(movieId) {
+            if (!confirm('Are you sure you want to remove this movie from favorites?')) {
+                return;
+            }
+            
+            try {
+                // ✅ Usar el store para eliminar (esto sincroniza con otros componentes)
+                await this.favoritesStore.toggleFavorite(this.userId, movieId);
                 
-                try{
-                    await FavoritesService.deleteFromFavorites(this.userId, movieId);
+                // Actualizar solo los detalles locales (el store ya actualizó favorites)
+                this.favoritesWithDetails = this.favoritesWithDetails.filter(
+                    m => m.id !== String(movieId)
+                );
+                
+            } catch (err) {
+                this.error = 'Error al eliminar: ' + err.message;
+                console.error(err);
+            }
+        },
 
-                    // Actualizar arrays locales sin recargar todo
-                    this.favorites = this.favorites.filter(f => f.movieId !== String(movieId));
-                    this.favoritesWithDetails = this.favoritesWithDetails.filter(m => m.id !== String(movieId));
-                } catch (err){
-                    this.error = 'Error al eliminar: ' + err.message;
-                    console.error(err);
-                }
-            },
+        goToMovie(movieId) {
+            this.$router.push(`/movies/${movieId}`);
+        },
 
-            isFavorite(movieId){
-                const movieIdStr = String(movieId);
-                return this.favorites.some(f => f.movieId === movieIdStr);
-            },
+        sortBy(field) {
+            if (this.sortByField === field) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortByField = field;
+                this.sortDirection = ['runtime', 'vote_average', 'release_date'].includes(field) ? 'desc' : 'asc';
+            }
+        },
 
-            goToMovie(movieId){
-                this.$router.push(`/movies/${movieId}`);
-            },
-
-            sortBy(field){
-                if (this.sortByField === field){
-                    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-                }else {
-                    this.sortByField = field;
-                    this.sortDirection = ['runtime', 'vote_average', 'release_date'].includes(field) ? 'desc' : 'asc';
-                }
-            },
-
-            getSortIcon(field) {
-                if (this.sortByField !== field) return 'bi bi-sort-down text-muted'; 
-                return this.sortDirection === 'asc'
+        getSortIcon(field) {
+            if (this.sortByField !== field) return 'bi bi-sort-down text-muted'; 
+            return this.sortDirection === 'asc'
                 ? 'bi bi-sort-alpha-down-alt'
                 : 'bi bi-sort-alpha-down';
-            },
-
-            showPosterModal(posterPath) {
-                if (posterPath) {
-                    const largeImageUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
-                    this.modalPosterUrl = largeImageUrl;
-                    this.showModal = true;
-                    document.body.classList.add('modal-open');
-                }
-            },   
-            
-            hidePosterModal() {
-                this.showModal = false;
-                this.modalPosterUrl = '';
-                document.body.classList.remove('modal-open');
-            },
-
-            getPosterUrl(path) {
-                if (!path) return "https://via.placeholder.com/50x75/333/FFFFFF?text=No+Img";
-                return `${BASE_IMAGE_URL}${path}`;
-            },
-
-            formatRating(rating) {
-                if (typeof rating !== 'number') return 'N/A';
-                return rating.toFixed(1);
-            },
-
-            formatDate(dateString) {
-                if (!dateString) return 'N/A';
-                return new Date(dateString).toLocaleDateString();
-            },
-
-            formatGenres(genres) {
-                if (!genres || genres.length === 0) return 'N/A';
-                return genres.map(g => g.name).join(', ');
-            },
         },
 
-        mounted(){
-            this.loadFavorites();
+        showPosterModal(posterPath) {
+            if (posterPath) {
+                const largeImageUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
+                this.modalPosterUrl = largeImageUrl;
+                this.showModal = true;
+                document.body.classList.add('modal-open');
+            }
+        },   
+        
+        hidePosterModal() {
+            this.showModal = false;
+            this.modalPosterUrl = '';
+            document.body.classList.remove('modal-open');
         },
 
-        watch: {
-            userId: {
-                immediate: true,
-                handler(newId, oldId) {
-                    if (newId !== oldId && newId !== null) {
-                        this.loadFavorites();
-                    } else if (newId === null) {
-                        this.favorites = [];
-                        this.favoritesWithDetails = [];
-                    }
+        getPosterUrl(path) {
+            if (!path) return "https://via.placeholder.com/50x75/333/FFFFFF?text=No+Img";
+            return `${BASE_IMAGE_URL}${path}`;
+        },
+
+        formatRating(rating) {
+            if (typeof rating !== 'number') return 'N/A';
+            return rating.toFixed(1);
+        },
+
+        formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString();
+        },
+
+        formatGenres(genres) {
+            if (!genres || genres.length === 0) return 'N/A';
+            return genres.map(g => g.name).join(', ');
+        }
+    },
+
+    mounted() {
+        this.loadFavorites();
+    },
+
+    watch: {
+        // ✅ Recargar cuando cambie el userId
+        userId: {
+            immediate: true,
+            handler(newId, oldId) {
+                if (newId !== oldId && newId !== null) {
+                    this.loadFavorites();
+                } else if (newId === null) {
+                    this.favoritesWithDetails = [];
                 }
             }
-        }            
-    }
+        },
+        
+        // ✅ NUEVO: Recargar detalles cuando cambien los favoritos del store
+        'favoritesStore.favorites': {
+            handler() {
+                // Solo recargar si hay cambios significativos
+                if (this.favorites.length !== this.favoritesWithDetails.length) {
+                    this.loadFavorites();
+                }
+            },
+            deep: true
+        }
+    }            
+};
 </script>
 
 <style scoped>

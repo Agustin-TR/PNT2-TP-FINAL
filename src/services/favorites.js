@@ -26,8 +26,6 @@ class FavoritesService {
 
     const newFavorite = {
       movieId: idStr,
-      comment: "",
-      rating: 0,
     };
 
     setFavorite(user, newFavorite);
@@ -47,11 +45,11 @@ class FavoritesService {
     return true;
   };
 
-  setRating = async (userId, movieId, rating) => {
+  /*setRating = async (userId, movieId, rating) => {
     const user = findUser(userId);
     if (!user) throw new Error("User not found.");
 
-    const favorite = this._getFavorite(user, movieId);
+    const favorite = this._getFavoriteById(userId, movieId);
 
     // Validate rating as a valid integer (e.g. between 0 and 5)
     if (typeof rating !== "number" || rating < 0 || rating > 5) {
@@ -60,13 +58,18 @@ class FavoritesService {
 
     setRatingDB(favorite, rating);
     return true;
+  };*/
+
+  setRating = async (user, movieId, rating) => {
+    setRatingDB(user, movieId, rating);
+    return true;
   };
 
-  deleteRating = async (userId, favoriteId) => {
+  deleteRating = async (userId, movieId) => {
     const user = findUser(userId);
     if (!user) throw new Error("User not found.");
 
-    const favorite = this._getFavoriteById(favoriteId);
+    const favorite = this._getFavoriteById(userId, movieId);
 
     deleteRatingDB(favorite, rating);
 
@@ -74,7 +77,7 @@ class FavoritesService {
   };
 
   // --- Find favorite by ID ---
-  _getFavoriteById(userId, movieId) {
+  /*_getFavoriteById(userId, movieId) {
     const user = findUser(userId);
     const idStr = String(movieId);
     const favorite = user.favorites.find((f) => f.movieId === idStr);
@@ -82,14 +85,19 @@ class FavoritesService {
       throw new Error("The movie is not in favorites.");
     }
     return favorite;
-  }
+  }*/
 
-  setCommentToFavorite = async (userId, movieId, comment) => {
+  /*setCommentToFavorite = async (userId, movieId, comment) => {
     const user = findUser(userId);
     if (!user) throw new Error("User not found.");
 
     const favorite = this._getFavorite(user, movieId);
     setComment(favorite, comment);
+    return true;
+  };*/
+
+  setComment = async (user, movieId, comment) => {
+    setComment(user, movieId, comment);
     return true;
   };
 
