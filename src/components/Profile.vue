@@ -63,9 +63,11 @@
           </div>
         </form>
       </div>
+      <!-- TAB: WATCHLIST -->
       <div v-if="activeTab === 'watchlist'">
         <Spinner v-if="loading" />
-        <WatchlistReset />
+        <Watchlist @counter="updateCounter"/>
+        <ConfirmResetModal :counter="counter" @confirmed="canReset" />
       </div>
 
       <!-- Modal -->
@@ -122,11 +124,12 @@ import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/authStore";
 import authService from "@/services/auth";
 import Spinner from "./Spinner.vue";
-import WatchlistReset from "./WatchlistReset.vue";
+import ConfirmResetModal from "./ConfirmResetModal.vue";
+import Watchlist from "./Watchlist.vue";
 
 export default {
   name: "Profile",
-  components: { Spinner, WatchlistReset },
+  components: { Spinner, ConfirmResetModal, Watchlist },
   data() {
     return {
       activeTab: "profile",
@@ -149,6 +152,7 @@ export default {
       successMessage: "",
       modalInstance: null,
       authStore: useAuthStore(),
+      counter: 0
     };
   },
   computed: {
@@ -160,6 +164,9 @@ export default {
     },
   },
   methods: {
+    updateCounter(newCount) {
+        this.counter = newCount;
+    },
     setActiveTab(tab) {
       this.activeTab = tab;
     },

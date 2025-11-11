@@ -7,7 +7,7 @@
       data-bs-toggle="modal"
       data-bs-target="#confirmResetModal"
     >
-      Reset Watchlist
+      Reset {{ counter }} Movies
     </button>
 
     <!-- Modal -->
@@ -22,7 +22,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="confirmResetModalLabel">
-              Confirm Reset
+              Read Carefully Before Confirming
             </h5>
             <button
               type="button"
@@ -33,13 +33,7 @@
           </div>
 
           <div class="modal-body">
-            <p>Type <strong>RESET</strong> to confirm clearing your watchlist.</p>
-            <input
-              type="text"
-              class="form-control"
-              v-model="confirmationText"
-              placeholder="Type RESET"
-            />
+            <p>Type <strong>RESET</strong> to confirm resetting your {{ counter }} movie watchlist to zero.</p>
           </div>
 
           <div class="modal-footer">
@@ -65,21 +59,12 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { ref } from "vue";
 
-// Emits an event to the parent
-const emit = defineEmits(["confirmed"]);
-
-const confirmationText = ref("");
-
-// Handle confirmation logic
-const handleConfirm = () => {
-  const modalElement = document.getElementById("confirmResetModal");
-  const modalInstance = bootstrap.Modal.getInstance(modalElement);
-  modalInstance.hide();
-
-  emit("confirmed", true); // ✅ Send confirmation to parent
-  confirmationText.value = "";
+export default {
+  name: "ConfirmResetModal",
+  props: ['counter'],
 };
 </script>
+    
