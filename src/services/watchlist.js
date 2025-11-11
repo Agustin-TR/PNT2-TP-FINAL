@@ -1,51 +1,65 @@
-import { findUser, setWatchItem, deleteWatchItem } from "./db";
+import { useAuthStore } from "@/stores/authStore";
 
 class WatchlistService {
-  getAllWatchlist = async (userId) => {
-    const user = findUser(userId);
-    return user.watchlist; // Returns the array of watchlist items
+  getAllWatchlist = async () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+    return user.watchlist || [];
   };
 
-  addToWatchlist = async (userId, movieId) => {
-    const user = findUser(userId);
+  addToWatchlist = async (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
     if (!user) throw new Error("User not found.");
 
     const idStr = String(movieId);
 
+    if (!user.watchlist) user.watchlist = [];
     if (user.watchlist.includes(idStr)) {
       throw new Error("The movie is already in the watchlist.");
     }
 
-    setWatchItem(user, idStr);
-    return true;
-};
+    user.watchlist.push(idStr);
+    this._updateUser(authStore, user);
+    return user.watchlist;
+  };
 
-isInWatchlist = async (userId, movieId) => {
-        const user = findUser(userId);
-        if (!user) throw new Error("User not found.");
-
-        const idStr = String(movieId);
-        if (!user.watchlist.includes(idStr)) {
-            return false;
-        } else {
-            return true;
-        }
-    };
-
-  removeFromWatchlist = async (userId, movieId) => {
-    const user = findUser(userId);
+  isInWatchlist = (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
     if (!user) throw new Error("User not found.");
+
     const idStr = String(movieId);
+    return user.watchlist?.includes(idStr) || false;
+  };
 
-    const index = user.watchlist.findIndex((id) => id === idStr);
+  removeFromWatchlist = async (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
 
-    if (index === -1) {
+    const idStr = String(movieId);
+    const index = user.watchlist?.indexOf(idStr);
+
+    if (index === -1 || index === undefined) {
       throw new Error("The movie was not found in the watchlist.");
     }
 
-    deleteWatchItem(user, index);
+    user.watchlist.splice(index, 1);
+    this._updateUser(authStore, user);
     return user.watchlist;
   };
+
+  // 🔒 helper method to persist user updates in storage
+  _updateUser(authStore, user) {
+    authStore.user = user;
+    if (localStorage.getItem("token")) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    }
+  }
 }
 
 export default new WatchlistService();

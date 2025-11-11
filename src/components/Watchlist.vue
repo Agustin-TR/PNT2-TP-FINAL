@@ -3,7 +3,7 @@
         <h2 class="mb-4">📺 My Watchlist</h2>
 
         <div v-if="!isAuthenticated" class="alert alert-danger" role="alert">
-            **Error:** You must be logged in to view your watchlist.
+            You must be logged in to view your watchlist.
         </div>
 
         <div v-else-if="isLoading" class="alert alert-info" role="alert">
@@ -242,7 +242,7 @@ export default {
             }
             
             try {
-                await WatchlistService.removeFromWatchlist(this.userId, movieId);
+                await WatchlistService.removeFromWatchlist(movieId);
                 await this.getWatchlist();
             } catch (err) {
                 alert("Error removing item: " + err.message);

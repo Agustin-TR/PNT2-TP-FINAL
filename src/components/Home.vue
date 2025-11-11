@@ -119,6 +119,7 @@ export default {
     watchlistCount() {
     return this.authStore.user?.watchlist?.length || 0;
     },
+    ...mapState(useAuthStore, ["isAuthenticated", "user"]),
     // Reactive computed property to get the logged-in user's ID
     userId() {
       return this.authStore.user ? this.authStore.user.id : null;
@@ -165,7 +166,7 @@ export default {
 
       try {
         // Fetch movie IDs using the logged-in user's ID
-        const movieIds = await WatchlistService.getAllWatchlist(this.authStore.user.id);
+        const movieIds = await WatchlistService.getAllWatchlist();
 
         // Ensure movie IDs are consistently strings (as used in toggleWatchlist and isAdded)
         this.watchlist = movieIds.map(String);
@@ -200,22 +201,19 @@ export default {
         return;
       }
 
-      const isCurrentlyAdded = this.watchlist.includes(movieIdStr);
+      const isCurrentlyAdded = WatchlistService.isInWatchlist(movieIdStr);
 
       try {
         if (isCurrentlyAdded) {
           // Remove from watchlist
-          // Assuming service returns the updated list (as per your initial service structure)
-          const newWatchlist = await WatchlistService.removeFromWatchlist(
-            this.authStore.user.id,
-            movieIdStr
-          );
+          const newWatchlist = await WatchlistService.removeFromWatchlist(movieIdStr);
+
           this.watchlist = newWatchlist.map(String);
         } else {
           // Add to watchlist
-          await WatchlistService.addToWatchlist(this.authStore.user.id, movieIdStr);
+          await WatchlistService.addToWatchlist(movieIdStr);
           // Manually update the local state for immediate visual feedback
-          this.watchlist.push(movieIdStr);
+          //this.watchlist.push(movieIdStr);
         }
       } catch (error) {
         console.error(`Error toggling watchlist for movie ${movieId}:`, error);
@@ -225,7 +223,7 @@ export default {
 
     isAdded(movieId) {
       // Check for existence using the movie ID cast as a string
-      return this.watchlist.includes(String(movieId));
+      return WatchlistService.isInWatchlist(String(movieId));
     },
     goToDetails(movieId) {
       this.$router.push({ name: "Movie", params: { id: movieId } });
