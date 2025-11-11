@@ -90,6 +90,7 @@
 import movieService from "../services/movies";
 import WatchlistService from "../services/watchlist";
 import { useAuthStore } from "../stores/authStore";
+import { useCompareStore } from "@/stores/compareStore";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
@@ -105,6 +106,7 @@ export default {
       loading: true,
       error: null,
       authStore: useAuthStore(),
+      compareStore: useCompareStore(),
       selectedMovies: [],
       selectedCount: 0,
       selectionMax: 3,
@@ -133,7 +135,7 @@ export default {
     },
     goToCompare(){
       this.selectedMovies = this.movies.filter(m => m.selected);
-      this.authStore.setSelectedMovies(this.selectedMovies);
+      this.compareStore.setSelectedMovies(this.selectedMovies);
       this.$router.push({ path: '/compare' });
     },
     /**
