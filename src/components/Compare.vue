@@ -1,5 +1,5 @@
 <template>
-    <div class="container mt-5">
+    <div class="container mt-5 mb-4 min-vh-100 d-flex flex-column">
         <h1 class="mb-4">Compare your movies</h1>
 
         <div v-if="loading" class="text-center my-5">
@@ -8,13 +8,12 @@
 
         <div v-else-if="error" class="alert alert-danger text-center">
             <span>{{ error }}</span> -
-            <router-link to="/" class="text-dark fw-bold text-decoration-none">Go home</router-link>
         </div>
 
-        <div v-else-if="selectedMovies.length" class="d-flex flex-wrap gap-3 justify-content-center">
-            <div v-for="(movie, index) in selectedMovies" :key="index" class="card shadow-sm" style="width: 300px">
-                <img :src="getPosterUrl(movie.poster_path)" class="card-img-top" :alt="movie.title"
-                    style="height: 450px; object-fit: cover" />
+        <div v-else-if="selectedMovies.length" class="d-flex flex-wrap gap-3 justify-content-center flex-grow-1">
+            <div v-for="(movie, index) in selectedMovies" :key="index" class="card shadow-sm movie-card mb-5">
+                <img :src="getPosterUrl(movie.poster_path)" class="card-img-top object-fit-cover movie-img"
+                    :alt="movie.title" />
                 <div class="card-body">
                     <h5 class="card-title">{{ movie.title }} ({{ getYear(movie.release_date) }})</h5>
                     <p class="card-text text-muted">{{ movie.tagline || 'No tagline available.' }}</p>
@@ -34,14 +33,19 @@
             </div>
         </div>
 
-        <div v-else class="alert alert-info text-center">
+        <div v-else class="alert alert-info text-center flex-grow-1">
             No movies selected for comparison.
+            <router-link to="/" class="text-dark fw-bold text-decoration-none">Go home</router-link>
         </div>
     </div>
+
+    <button class="btn btn-lg btn-outline-primary mt-3 mb-5" @click="$router.go(-1)">
+        ← Back
+    </button>
 </template>
 
 <script>
-import { useAuthStore } from "../stores/authStore";
+import { useCompareStore } from "../stores/compareStore";
 import movieService from "../services/movies";
 import Spinner from "./Spinner.vue";
 
@@ -54,7 +58,7 @@ export default {
     },
     data() {
         return {
-            authStore: useAuthStore(),
+            compareStore: useCompareStore(),
             selectedMovies: [],
             loading: true,
             error: null,
@@ -66,7 +70,7 @@ export default {
             this.error = null;
 
             try {
-                const selected = this.authStore.getSelectedMovies;
+                const selected = this.compareStore.getSelectedMovies;
                 const promises = selected.map((m) => movieService.getMovieDetails(m.id));
                 this.selectedMovies = await Promise.all(promises);
             } catch (err) {
@@ -90,3 +94,14 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.movie-card {
+    width: 300px;
+}
+
+.movie-img {
+    height: 450px;
+    object-fit: cover;
+}
+</style>
