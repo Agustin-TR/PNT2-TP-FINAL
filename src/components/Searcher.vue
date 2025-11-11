@@ -116,13 +116,23 @@ export default {
     },
 
     goToDetails(movieId) {
-      this.$router.push({ name: "Movie", params: { id: movieId } });
+      if (
+        this.$route.name === "Movie" &&
+        this.$route.params.id === String(movieId)
+      ) {
+        this.$router.replace({
+          name: "Movie",
+          params: { id: movieId },
+          query: { t: Date.now() },
+        });
+      } else {
+        this.$router.push({ name: "Movie", params: { id: movieId } });
+      }
 
       this.searchText = "";
       this.results = [];
       this.showDropdown = false;
     },
-
     hideDropdown() {
       setTimeout(() => {
         this.showDropdown = false;
