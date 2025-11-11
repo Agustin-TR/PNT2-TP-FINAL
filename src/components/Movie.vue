@@ -93,12 +93,50 @@
                     </button>
                 </div>
                 <div class="col-4">
-                    <button class="btn btn-sm w-100 btn-warning">Favoritos</button>
+                    <button 
+                        class="btn btn-sm w-100" 
+                        :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'" 
+                        @click.stop="toggleFavs(movie.id)"
+                    >
+                        {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+                    </button>
                 </div>
                 <div class="col-4">
-                    <button class="btn btn-sm w-100 btn-dark">Comparar</button>
+                    <button class="btn btn-sm w-100 btn-dark">Compare</button>
                 </div>
             </div>
+            </section>
+            <hr />
+            <section class="container">
+                <h4 class="mb-3">Rate this movie</h4> 
+                <div class="rating-stars-emoji">
+                    <input type="radio" id="star5" name="rating" value="5" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star5" title="5 stars">⭐</label>
+                    <input type="radio" id="star4" name="rating" value="4" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star4" title="4 stars">⭐</label>
+                    <input type="radio" id="star3" name="rating" value="3" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star3" title="3 stars">⭐</label>
+                    <input type="radio" id="star2" name="rating" value="2" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star2" title="2 stars">⭐</label>
+                    <input type="radio" id="star1" name="rating" value="1" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star1" title="1 star">⭐</label>
+                </div>
+            </section>            
+            <hr />
+            <section class="container">
+                <h4 class="mb-3">Leave a comment 💬</h4>
+                <form @submit.prevent="handleCommentSubmit">
+                    <div class="mb-3">
+                        <textarea
+                            v-model="newComment"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Write your review of this movie..."
+                            required
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send comment</button>
+                </form>
             </section>
             <hr />
             <button
@@ -109,12 +147,12 @@
             </button>
         </div>
 
-        <div v-if="movie?.reviews?.length" class="mt-5">
-            <h2 class="mb-4">Reviews ({{ movie.reviews.length }}) 📢</h2>
+        <div v-if="allReviews?.length" class="mt-5">
+            <h2 class="mb-4">Reviews ({{ allReviews.length }}) 📢</h2>
 
             <div class="row g-3">
             <div
-                v-for="review in movie.reviews"
+                v-for="review in allReviews"
                 :key="review.id"
                 class="col-12 col-md-6 col-lg-4"
             >
@@ -159,10 +197,12 @@
 
 <script>
     import { useAuthStore } from "../stores/authStore";
+    import { useFavoritesStore } from "../stores/favoritesStore"
     import Spinner from "./Spinner.vue";
     import movieService from "../services/movies";
     import userAvatar from "../assets/user.svg";
     import WatchlistService from "../services/watchlist";
+    import FavoritesService from "../services/favorites"
 
     const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
@@ -179,10 +219,13 @@
     data() {
         return {
         movie: { reviews: [] },
+        localReviews: [],
         loading: true,
         error: null,
         watchlist: [],
         isInWatchlist: false, // <-- FIXED: local state for async check
+        userRating: 0,
+        newComment: '',
         };
     },
     computed: {
@@ -209,89 +252,164 @@
             return "badge bg-success text-light"; // 🟢 Green for good
             return "badge bg-gradient text-light";  // 💎 Gradient for amazing
         },
+        favoritesStore(){
+            return useFavoritesStore();
+        },
+        allReviews() {
+          return [...this.localReviews, ...(this.movie.reviews || [])];  
+        },
     },
     methods: {
         async fetchMovieDetails() {
-        this.loading = true;
-        this.error = null;
-        const movieId = this.id || this.$route.params.id;
+            this.loading = true;
+            this.error = null;
+            const movieId = this.id || this.$route.params.id;
 
-        if (!movieId) {
-            this.error = "Movie ID not provided.";
-            this.loading = false;
-            return;
-        }
+            if (!movieId) {
+                this.error = "Movie ID not provided.";
+                this.loading = false;
+                return;
+            }
 
-        try {
-            this.movie = await movieService.getMovieDetails(movieId);
-        } catch (err) {
-            console.error("Could not fetch movie details:", err);
-            this.error = "Could not load movie details.";
-        } finally {
-            this.loading = false;
-        }
+            try {
+                this.movie = await movieService.getMovieDetails(movieId);
+            } catch (err) {
+                console.error("Could not fetch movie details:", err);
+                this.error = "Could not load movie details.";
+            } finally {
+                this.loading = false;
+            }
         },
+
         async fetchMovieReviews() {
-        const movieId = this.id || this.$route.params.id;
-        if (!movieId) return;
+            const movieId = this.id || this.$route.params.id;
+            if (!movieId) return;
 
-        try {
-            const reviews = await movieService.getMovieReviews(movieId);
-            this.movie.reviews = reviews.results;
-        } catch (err) {
-            console.error("Could not fetch movie reviews:", err);
-            this.movie.reviews = [];
-        }
+            try {
+                const reviews = await movieService.getMovieReviews(movieId);
+                this.movie.reviews = reviews.results;
+            } catch (err) {
+                console.error("Could not fetch movie reviews:", err);
+                this.movie.reviews = [];
+            }
         },
+
         getAvatarUrl(path) {
-        if (!path) return null;
-        if (path.startsWith("/https")) return path.substring(1);
-        return `${BASE_IMAGE_URL}${path}`;
+            if (!path) return null;
+            if (path.startsWith("/https")) return path.substring(1);
+            return `${BASE_IMAGE_URL}${path}`;
         },
+
         async toggleWatchlist(movieId) {
-        const movieIdStr = String(movieId);
+            const movieIdStr = String(movieId);
 
-        if (!this.userId) {
-            alert("Please log in to add items to your watchlist.");
-            return;
-        }
+            if (!this.userId) {
+                alert("Please log in to add items to your watchlist.");
+                return;
+            }
 
-        try {
-            const currentlyInList = await WatchlistService.isInWatchlist(
-            this.userId,
-            movieIdStr
-            );
-
-            if (currentlyInList) {
-            const newWatchlist = await WatchlistService.removeFromWatchlist(
+            try {
+             const currentlyInList = await WatchlistService.isInWatchlist(
                 this.userId,
                 movieIdStr
-            );
-            this.watchlist = newWatchlist.map(String);
-            this.isInWatchlist = false;
-            } else {
-            await WatchlistService.addToWatchlist(this.userId, movieIdStr);
-            this.watchlist.push(movieIdStr);
-            this.isInWatchlist = true;
+                );
+
+                if (currentlyInList) {
+                const newWatchlist = await WatchlistService.removeFromWatchlist(
+                    this.userId,
+                    movieIdStr
+                );
+                this.watchlist = newWatchlist.map(String);
+                this.isInWatchlist = false;
+                } else {
+                await WatchlistService.addToWatchlist(this.userId, movieIdStr);
+                this.watchlist.push(movieIdStr);
+                this.isInWatchlist = true;
+                }
+            } catch (error) {
+                console.error(`Error toggling watchlist for movie ${movieId}:`, error);
+                alert(`Could not update watchlist: ${error.message}`);
             }
-        } catch (error) {
-            console.error(`Error toggling watchlist for movie ${movieId}:`, error);
-            alert(`Could not update watchlist: ${error.message}`);
-        }
         },
+
+        async toggleFavs(movieId) {
+            if (!this.userId) {
+                alert("Please log in to add items to your favorites.");
+                return;
+            }
+            try {
+                //el store llama al servicio internamente
+                await this.favoritesStore.toggleFavorite(this.userId, movieId);
+            }catch (err){
+                alert(`Could not update favorites: ${err.message}`);
+            }
+        },    
+        
+        async handleCommentSubmit() {
+            if (!this.userId) {
+                alert("Please log in to add items to your favorites.");
+                return;
+            }
+            if (!this.newComment.trim()) {
+            alert('The comment cannot be empty..');
+            return;
+            }
+
+            try{
+                await FavoritesService.setComment(this.user, this.movie.id, this.newComment);
+
+                const newReview = {
+                    id: `local_${Date.now()}`,
+                    author: this.authStore.user?.firstName+ " " +this.authStore.user?.lastName || this.authStore.user?.email || 'Anonymous',
+                    content: this.newComment.trim(),
+                    created_at: new Date().toISOString(),
+                    author_details: {
+                        avatar_path: null,
+                        rating: this.userRating || null
+                    }
+                };   
+
+                this.localReviews.unshift(newReview);
+                this.newComment = '';
+                alert('Comment added successfully!');
+            }catch (err){
+                console.error('Error adding comment:', err);
+                alert('Could not add comment. Please try again.');
+            }
+        },
+
+        async handleRatingSubmit() {
+            console.log('El usuario puntuó con:', this.userRating, 'estrellas');
+            if (!this.userId) {
+                alert("Please log in to add items to your favorites.");
+                return;
+            };
+
+            try{
+                await FavoritesService.setRating(this.user, this.movie.id, parseInt(this.userRating));
+                alert('Thank you for your rating!');
+            } catch (err){
+                alert(`Could not update your rating: ${err.message}`);
+            }
+        }
     },
     async mounted() {
         await this.fetchMovieDetails();
         await this.fetchMovieReviews();
 
         if (this.userId && this.movie?.id) {
+
         this.isInWatchlist = await WatchlistService.isInWatchlist(
             this.userId,
             String(this.movie.id)
         );
         }
+
+        if(this.userId){
+        await this.favoritesStore.loadFavorites(this.userId);
+        }
     },
-    };
+};
 </script>
 
 
@@ -327,5 +445,40 @@
         line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    }
+
+    .rating-stars-emoji {
+        display: flex;
+        flex-direction: row-reverse; 
+        justify-content: flex-end;
+        cursor: pointer;
+    }
+
+    .rating-stars-emoji input[type="radio"] {
+        display: none; 
+    }
+
+    .rating-stars-emoji label {
+        font-size: 3rem; /* <-- 1. MÁS GRANDE */
+        margin: 0 0.1em;
+        opacity: 0.3; /* <-- 2. ESTADO "VACÍO" (tenue) */
+        transition: opacity 0.2s;
+    }
+
+    /* Efecto hover y "checked" (seleccionado):
+    Cuando pasas el mouse (hover) O cuando está seleccionada (checked),
+    la estrella y todas las anteriores se vuelven sólidas.
+    */
+    .rating-stars-emoji:not(:hover) input[type="radio"]:checked ~ label,
+    .rating-stars-emoji:hover input[type="radio"]:hover ~ label,
+    .rating-stars-emoji label:hover ~ label {
+        opacity: 1; /* <-- 3. ESTADO "LLENO" (sólido) */
+    }
+
+    /* Estilo individual para la estrella sobre la que estás
+    o la que ya está seleccionada.*/
+    .rating-stars-emoji input[type="radio"]:checked + label,
+    .rating-stars-emoji label:hover {
+        opacity: 1;
     }
 </style>

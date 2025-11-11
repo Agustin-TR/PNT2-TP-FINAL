@@ -43,10 +43,11 @@
           <button
             id="btn-favs"
             class="btn btn-sm w-100"
-            :class="isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
+            :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
             @click.stop="toggleFavs(movie.id)"
           >
-            {{ isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+            {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+
           </button>
 
           <button
@@ -90,6 +91,7 @@
 import movieService from "../services/movies";
 import WatchlistService from "../services/watchlist";
 import { useAuthStore } from "../stores/authStore";
+import { useFavoritesStore } from "../stores/favoritesStore";
 import { useCompareStore } from "@/stores/compareStore";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
@@ -102,7 +104,6 @@ export default {
       movies: [],
       // watchlist holds movie IDs as strings, matching your service/db
       watchlist: [],
-      favorites: [],
       loading: true,
       error: null,
       authStore: useAuthStore(),
@@ -112,6 +113,7 @@ export default {
       selectionMax: 3,
     };
   },
+
   computed: {
     watchlistCount() {
       return this.watchlist.length;
@@ -120,7 +122,11 @@ export default {
     userId() {
       return this.authStore.user ? this.authStore.user.id : null;
     },
+    favoritesStore(){
+      return useFavoritesStore();
+    },
   },
+
   methods: {
     goToWatchlist() {
       this.$router.push("/watchlist");
@@ -159,12 +165,17 @@ export default {
         console.error("Error fetching watchlist:", error);
       }
     },
-    toggleFavs(movieId) {
-      const index = this.favorites.indexOf(movieId);
-      if (index > -1) {
-        this.favorites.splice(index, 1);
-      } else {
-        this.favorites.push(movieId);
+
+    async toggleFavs(movieId) {
+      if (!this.userId) {
+        alert("Please log in to add items to your favorites.");
+        return;
+      }
+      try {
+        //el store llama al servicio internamente
+        await this.favoritesStore.toggleFavorite(this.userId, movieId);
+      }catch (err){
+        alert(`Could not update favorites: ${err.message}`);
       }
     },
 
@@ -208,9 +219,6 @@ export default {
       // Check for existence using the movie ID cast as a string
       return this.watchlist.includes(String(movieId));
     },
-    isFavorite(movieId) {
-      return this.favorites.includes(movieId);
-    },
     goToDetails(movieId) {
       this.$router.push({ name: "Movie", params: { id: movieId } });
     },
@@ -245,6 +253,11 @@ export default {
     // 2. Fetch the user's watchlist immediately after.
     // This populates the watchlist array and sets the initial state for isAdded().
     await this.getWatchlist();
+
+    //cargar favs una vez
+    if(this.userId){
+      await this.favoritesStore.loadFavorites(this.userId);
+    }
   },
 };
 </script>
