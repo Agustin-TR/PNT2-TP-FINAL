@@ -10,17 +10,14 @@ export const useAuthStore = defineStore("auth", {
       ? JSON.parse(localStorage.getItem("user"))
       : null;
 
-    const selectedMovies = [];
-
     return {
       token,
       user,
       isAuthenticated: !!token,
-      selectedMovies,
     };
   },
   getters: {
-    getSelectedMovies: (state) => state.selectedMovies,
+
   },
   actions: {
     login(userData) {
@@ -38,8 +35,5 @@ export const useAuthStore = defineStore("auth", {
       sessionStorage.clear();
     },
 
-    setSelectedMovies(movies) {
-      this.selectedMovies = movies;
-    },
   },
 });

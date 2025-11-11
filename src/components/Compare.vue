@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { useAuthStore } from "../stores/authStore";
+import { useCompareStore } from "../stores/compareStore";
 import movieService from "../services/movies";
 import Spinner from "./Spinner.vue";
 
@@ -61,7 +61,7 @@ export default {
     },
     data() {
         return {
-            authStore: useAuthStore(),
+            compareStore: useCompareStore(),
             selectedMovies: [],
             loading: true,
             error: null,
@@ -73,7 +73,7 @@ export default {
             this.error = null;
 
             try {
-                const selected = this.authStore.getSelectedMovies;
+                const selected = this.compareStore.getSelectedMovies;
                 const promises = selected.map((m) => movieService.getMovieDetails(m.id));
                 this.selectedMovies = await Promise.all(promises);
             } catch (err) {
