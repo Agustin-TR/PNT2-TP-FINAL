@@ -63,6 +63,10 @@
           </div>
         </form>
       </div>
+      <div v-if="activeTab === 'watchlist'">
+        <Spinner v-if="loading" />
+        <WatchlistReset />
+      </div>
 
       <!-- Modal -->
       <div
@@ -118,10 +122,11 @@ import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/authStore";
 import authService from "@/services/auth";
 import Spinner from "./Spinner.vue";
+import WatchlistReset from "./WatchlistReset.vue";
 
 export default {
   name: "Profile",
-  components: { Spinner },
+  components: { Spinner, WatchlistReset },
   data() {
     return {
       activeTab: "profile",
