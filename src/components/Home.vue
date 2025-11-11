@@ -1,9 +1,12 @@
 <template>
   <h1 class="mb-4 text-center">Popular this week</h1>
 
-  <button :disabled="!isSelectionFull()"
-  class="btn btn-lg btn-primary mt-3 ms-auto d-block mb-3" @click="goToCompare()"
-  > Compare
+  <button
+    :disabled="!isSelectionFull()"
+    class="btn btn-lg btn-primary mt-3 ms-auto d-block mb-3"
+    @click="goToCompare()"
+  >
+    Compare
   </button>
 
   <div v-if="loading" class="text-center my-5">
@@ -22,57 +25,16 @@
       :key="movie.id"
       class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2"
     >
-      <div
-        class="card h-100 shadow-sm movie-card clickable"
-        @click="goToDetails(movie.id)"
-        style="cursor: pointer"
-      >
-        <img
-          :src="movie.posterUrl"
-          class="card-img-top"
-          :alt="movie.title"
-          loading="lazy"
-        />
-
-        <div class="card-body p-2 text-center">
-            <h6 class="card-title mb-1" style="height: 60px" :title="movie.title">
-              {{ movie.title }}
-            </h6>
-            <p class="card-text small text-muted">{{ movie.year }}</p>
-
-            <button
-            id="btn-favs"
-            class="btn btn-sm w-100"
-            :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
-            @click.stop="toggleFavs(movie.id)"
-          >
-            {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
-
-          </button>
-
-            <button
-                class="btn btn-sm w-100"
-                :class="isAdded(movie.id) ? 'btn-success' : 'btn-primary'"
-                @click.stop="toggleWatchlist(movie.id)"
-                v-if="isAuthenticated"
-                >
-                {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
-            </button>
-        </div>
-        <!-- ✅ Checkbox al final -->
-        <div class="form-check mt-auto text-center">
-          <input
-            class="form-check-input position-absolute top-0 end-0 m-2"
-            type="checkbox"
-            :id="'checkbox-' + movie.id"
-            v-model="movie.selected"
-            @change="isSelectionFull()"
-            :disabled="isCheckboxDisabled(movie)"
-            @click.stop
-          />
-          </div>
-
-      </div>
+      <MovieCard
+        :movie="movie"
+        :isAuthenticated="isAuthenticated"
+        :isAdded="isAdded"
+        :isCheckboxDisabled="isCheckboxDisabled"
+        :toggleWatchlist="toggleWatchlist"
+        :toggleFavs="toggleFavs"
+        :favoritesStore="favoritesStore"
+        :goToDetails="goToDetails"
+      />
     </div>
   </div>
 
@@ -80,9 +42,13 @@
     No popular movies found.
   </div>
 
-  <div  class="d-flex justify-content-center mt-3 mb-5">
-    <button v-if="isAuthenticated" class="btn btn-outline-dark" @click.stop="goToWatchlist">
-    My Watchlist ✨ ({{ watchlistCount }})
+  <div class="d-flex justify-content-center mt-3 mb-5">
+    <button
+      v-if="isAuthenticated"
+      class="btn btn-outline-dark"
+      @click.stop="goToWatchlist"
+    >
+      My Watchlist ✨ ({{ watchlistCount }})
     </button>
   </div>
 </template>
@@ -94,17 +60,21 @@ import { mapState, mapActions } from "pinia";
 import { useAuthStore } from "../stores/authStore";
 import { useFavoritesStore } from "../stores/favoritesStore";
 import { useCompareStore } from "@/stores/compareStore";
+import MovieCard from "./MovieCard.vue";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
 export default {
   name: "Home",
-
+  components: {
+    MovieCard,
+  },
   data() {
     return {
       movies: [],
       // watchlist holds movie IDs as strings, matching your service/db
       watchlist: [],
+      favoritesStore: useFavoritesStore(),
       loading: true,
       error: null,
       authStore: useAuthStore(),
@@ -117,41 +87,37 @@ export default {
 
   computed: {
     watchlistCount() {
-    return this.authStore.user?.watchlist?.length || 0;
+      return this.authStore.user?.watchlist?.length || 0;
     },
     ...mapState(useAuthStore, ["isAuthenticated", "user"]),
     // Reactive computed property to get the logged-in user's ID
     userId() {
       return this.authStore.user ? this.authStore.user.id : null;
     },
-    favoritesStore(){
-      return useFavoritesStore();
-    },
   },
 
   methods: {
     goToWatchlist() {
-        if (!this.authStore.isAuthenticated) {
-            alert("No user ID found. Cannot fetch watchlist.");
-            this.watchlist = [];
-            return;
-        }
-        else {
-            this.$router.push("/watchlist");
-        }
+      if (!this.authStore.isAuthenticated) {
+        alert("No user ID found. Cannot fetch watchlist.");
+        this.watchlist = [];
+        return;
+      } else {
+        this.$router.push("/watchlist");
+      }
     },
     //checkbox
     isCheckboxDisabled(movie) {
-    this.selectedCount = this.movies.filter(m => m.selected).length;
-    return this.isSelectionFull() && !movie.selected;
+      this.selectedCount = this.movies.filter((m) => m.selected).length;
+      return this.isSelectionFull() && !movie.selected;
     },
-    isSelectionFull(){
-      return this.selectedCount >= this.selectionMax
+    isSelectionFull() {
+      return this.selectedCount >= this.selectionMax;
     },
-    goToCompare(){
-      this.selectedMovies = this.movies.filter(m => m.selected);
+    goToCompare() {
+      this.selectedMovies = this.movies.filter((m) => m.selected);
       this.compareStore.setSelectedMovies(this.selectedMovies);
-      this.$router.push({ path: '/compare' });
+      this.$router.push({ path: "/compare" });
     },
     /**
      * Fetches the user's current watchlist from the service.
@@ -183,7 +149,7 @@ export default {
       try {
         //el store llama al servicio internamente
         await this.favoritesStore.toggleFavorite(this.userId, movieId);
-      }catch (err){
+      } catch (err) {
         alert(`Could not update favorites: ${err.message}`);
       }
     },
@@ -206,7 +172,9 @@ export default {
       try {
         if (isCurrentlyAdded) {
           // Remove from watchlist
-          const newWatchlist = await WatchlistService.removeFromWatchlist(movieIdStr);
+          const newWatchlist = await WatchlistService.removeFromWatchlist(
+            movieIdStr
+          );
 
           this.watchlist = newWatchlist.map(String);
         } else {
@@ -261,7 +229,7 @@ export default {
     await this.getWatchlist();
 
     //cargar favs una vez
-    if(this.userId){
+    if (this.userId) {
       await this.favoritesStore.loadFavorites(this.userId);
     }
   },

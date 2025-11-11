@@ -11,89 +11,81 @@
       loading="lazy"
     />
 
-    <div class="card-body p-2">
-      <h6 class="card-title mb-1 text-truncate" :title="movie.title">
+    <div class="card-body p-2 text-center">
+      <h6 class="card-title mb-1" style="height: 60px" :title="movie.title">
         {{ movie.title }}
       </h6>
       <p class="card-text small text-muted">{{ movie.year }}</p>
 
       <button
         id="btn-favs"
-        class="btn btn-sm w-100 mb-1"
-        :class="isFavorite ? 'btn-success' : 'btn-primary'"
+        class="btn btn-sm w-100 mb-2"
+        :class="
+          favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'
+        "
         @click.stop="toggleFavs(movie.id)"
       >
-        {{ isFavorite ? "❤️" : "+ ♡" }}
+        {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
       </button>
 
       <button
         class="btn btn-sm w-100"
-        :class="isAdded ? 'btn-success' : 'btn-primary'"
+        :class="isAdded(movie.id) ? 'btn-success' : 'btn-primary'"
         @click.stop="toggleWatchlist(movie.id)"
+        v-if="isAuthenticated"
       >
-        {{ isAdded ? "✅ In Watchlist" : "+ Watchlist" }}
+        {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
       </button>
+    </div>
+    <div class="form-check mt-auto text-center">
+      <input
+        class="form-check-input position-absolute top-0 end-0 m-2"
+        type="checkbox"
+        :id="'checkbox-' + movie.id"
+        v-model="movie.selected"
+        @change="isSelectionFull()"
+        :disabled="isCheckboxDisabled(movie)"
+        @click.stop
+      />
     </div>
   </div>
 </template>
 <script>
 export default {
   name: "MovieCard",
-  data() {
-    return {
-      isFavorite: false,
-      isAdded: false,
-    };
-  },
+
   props: {
     movie: {
       type: Object,
       required: true,
     },
-  },
-
-  methods: {
-    toggleFavs() {
-      alert(`Toggling favorite for movie ID: ${this.movie.id}`);
+    isAuthenticated: {
+      type: Boolean,
+      required: true,
     },
-    goToDetails(movieId) {
-      this.$router.push({ name: "Movie", params: { id: movieId } });
+    isAdded: {
+      type: Function,
+      required: true,
     },
-    /**
-     * Toggles a movie's presence in the watchlist, persisting the change via the service.
-     * @param {number} movieId The ID of the movie to toggle.
-     */
-    async toggleWatchlist(movieId) {
-      alert(`Toggling watchlist for movie ID: ${movieId}`);
-      const movieIdStr = String(movieId);
-
-      // GUARD RAIL: Prevent action if the user is not logged in
-      if (!this.userId) {
-        alert("Please log in to add items to your watchlist.");
-        return;
-      }
-
-      const isCurrentlyAdded = this.watchlist.includes(movieIdStr);
-
-      try {
-        if (isCurrentlyAdded) {
-          // Remove from watchlist
-          // Assuming service returns the updated list (as per your initial service structure)
-          const newWatchlist = await WatchlistService.removeFromWatchlist(
-            this.userId,
-            movieIdStr
-          );
-          this.watchlist = newWatchlist.map(String);
-        } else {
-          // Add to watchlist
-          await WatchlistService.addToWatchlist(this.userId, movieIdStr);
-          // Manually update the local state for immediate visual feedback
-          this.watchlist.push(movieIdStr);
-        }
-      } catch (error) {
-        console.error(`Error toggling watchlist for movie ${movieId}:`, error);
-        alert(`Could not update watchlist: ${error.message}`);
-      }
+    isCheckboxDisabled: {
+      type: Function,
+      required: true,
+    },
+    toggleWatchlist: {
+      type: Function,
+      required: true,
+    },
+    toggleFavs: {
+      type: Function,
+      required: true,
+    },
+    favoritesStore: {
+      type: Object,
+      required: true,
+    },
+    goToDetails: {
+      type: Function,
+      required: true,
     },
   },
 };
