@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getUsers, findUserByEmail, saveUser } from "./db";
 import { validateToken } from "@/utils/user";
 
 const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
