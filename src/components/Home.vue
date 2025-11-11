@@ -35,29 +35,29 @@
         />
 
         <div class="card-body p-2 text-center">
-          <h6 class="card-title mb-1" style="height: 60px" :title="movie.title">
-            {{ movie.title }}
-          </h6>
-          <p class="card-text small text-muted">{{ movie.year }}</p>
+            <h6 class="card-title mb-1" style="height: 60px" :title="movie.title">
+              {{ movie.title }}
+            </h6>
+            <p class="card-text small text-muted">{{ movie.year }}</p>
 
-          <button
+            <button
             id="btn-favs"
             class="btn btn-sm w-100"
             :class="isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
             @click.stop="toggleFavs(movie.id)"
-          >
+            >
             {{ isFavorite(movie.id) ? "❤️" : "+ ♡" }}
-          </button>
+            </button>
 
-          <button
-            class="btn btn-sm w-100"
-            :class="isAdded(movie.id) ? 'btn-success' : 'btn-primary'"
-            @click.stop="toggleWatchlist(movie.id)"
-          >
-            {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
-          </button>
+            <button
+                class="btn btn-sm w-100"
+                :class="isAdded(movie.id) ? 'btn-success' : 'btn-primary'"
+                @click.stop="toggleWatchlist(movie.id)"
+                v-if="isAuthenticated"
+                >
+                {{ isAdded(movie.id) ? "✅ In Watchlist" : "+ Watchlist" }}
+            </button>
         </div>
-
         <!-- ✅ Checkbox al final -->
         <div class="form-check mt-auto text-center">
           <input
@@ -79,16 +79,17 @@
     No popular movies found.
   </div>
 
-  <div class="d-flex justify-content-center mt-3 mb-5">
-    <a class="nav-link btn btn-outline-warning" @click.prevent="goToWatchlist">
-      My Watchlist ✨ ({{ watchlistCount }})
-    </a>
+  <div  class="d-flex justify-content-center mt-3 mb-5">
+    <button v-if="isAuthenticated" class="btn btn-outline-dark" @click.stop="goToWatchlist">
+    My Watchlist ✨ ({{ watchlistCount }})
+    </button>
   </div>
 </template>
 
 <script>
 import movieService from "../services/movies";
 import WatchlistService from "../services/watchlist";
+import { mapState, mapActions } from "pinia";
 import { useAuthStore } from "../stores/authStore";
 import { useCompareStore } from "@/stores/compareStore";
 
@@ -114,16 +115,20 @@ export default {
   },
   computed: {
     watchlistCount() {
-      return this.watchlist.length;
+    return this.authStore.user?.watchlist?.length || 0;
     },
-    // Reactive computed property to get the logged-in user's ID
-    userId() {
-      return this.authStore.user ? this.authStore.user.id : null;
-    },
+    ...mapState(useAuthStore, ["isAuthenticated", "user"]),
   },
   methods: {
     goToWatchlist() {
-      this.$router.push("/watchlist");
+        if (!this.authStore.isAuthenticated) {
+            alert("No user ID found. Cannot fetch watchlist.");
+            this.watchlist = [];
+            return;
+        }
+        else {
+            this.$router.push("/watchlist");
+        }
     },
     //checkbox
     isCheckboxDisabled(movie) {
@@ -143,7 +148,7 @@ export default {
      */
     async getWatchlist() {
       // GUARD RAIL: Check for user ID
-      if (!this.userId) {
+      if (!this.authStore.isAuthenticated) {
         console.warn("No user ID found. Cannot fetch watchlist.");
         this.watchlist = []; // Ensure the local list is empty if not logged in
         return;
@@ -151,7 +156,7 @@ export default {
 
       try {
         // Fetch movie IDs using the logged-in user's ID
-        const movieIds = await WatchlistService.getAllWatchlist(this.userId);
+        const movieIds = await WatchlistService.getAllWatchlist(this.authStore.user.id);
 
         // Ensure movie IDs are consistently strings (as used in toggleWatchlist and isAdded)
         this.watchlist = movieIds.map(String);
@@ -176,7 +181,7 @@ export default {
       const movieIdStr = String(movieId);
 
       // GUARD RAIL: Prevent action if the user is not logged in
-      if (!this.userId) {
+      if (!this.authStore.isAuthenticated) {
         alert("Please log in to add items to your watchlist.");
         return;
       }
@@ -188,13 +193,13 @@ export default {
           // Remove from watchlist
           // Assuming service returns the updated list (as per your initial service structure)
           const newWatchlist = await WatchlistService.removeFromWatchlist(
-            this.userId,
+            this.authStore.user.id,
             movieIdStr
           );
           this.watchlist = newWatchlist.map(String);
         } else {
           // Add to watchlist
-          await WatchlistService.addToWatchlist(this.userId, movieIdStr);
+          await WatchlistService.addToWatchlist(this.authStore.user.id, movieIdStr);
           // Manually update the local state for immediate visual feedback
           this.watchlist.push(movieIdStr);
         }
