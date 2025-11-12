@@ -4,8 +4,8 @@ import FavoritesService from "@/services/favorites";
 export const useFavoritesStore = defineStore("favorites", {
     state: () => ({
         favorites: [],
-        ratings: [],     // ✅ NUEVO
-        comments: [],    // ✅ NUEVO
+        ratings: [],     
+        comments: [],   
         loading: false,
         error: null
     }),
@@ -57,7 +57,7 @@ export const useFavoritesStore = defineStore("favorites", {
         async addFavorite(userId, movieId) {
             try {
                 const response = await FavoritesService.addToFavorites(userId, movieId);
-                this.favorites.push(response.favorite);
+                this.favorites = await FavoritesService.getAllFavorites(userId);
                 return response;
             } catch (err) {
                 this.error = err.message;
@@ -67,7 +67,8 @@ export const useFavoritesStore = defineStore("favorites", {
 
         async removeFavorite(movieId) {
             try {
-                const favorite = this.getFavoriteByMovieId(movieId);
+                const movieIdStr = String(movieId);
+                const favorite = this.favorites.find(f => f.movieId === movieIdStr);
                 if (!favorite) throw new Error('Favorito no encontrado');
                 
                 await FavoritesService.deleteFromFavorites(favorite.id);

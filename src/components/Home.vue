@@ -43,10 +43,10 @@
           <button
             id="btn-favs"
             class="btn btn-sm w-100"
-            :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
+            :class="isFavoriteMovie(movie.id) ? 'btn-success' : 'btn-primary'"
             @click.stop="toggleFavs(movie.id)"
           >
-            {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+            {{ isFavoriteMovie(movie.id) ? "❤️" : "+ ♡" }}
 
           </button>
 
@@ -125,6 +125,9 @@ export default {
     favoritesStore(){
       return useFavoritesStore();
     },
+    isFavoriteMovie() {
+      return (movieId) => this.favoritesStore.isFavorite(movieId);
+    }
   },
 
   methods: {

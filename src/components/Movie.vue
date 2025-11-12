@@ -95,10 +95,10 @@
                 <div class="col-4">
                     <button 
                         class="btn btn-sm w-100" 
-                        :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'" 
+                        :class="isFavoriteMovie(movie.id) ? 'btn-success' : 'btn-primary'" 
                         @click.stop="toggleFavs(movie.id)"
                     >
-                        {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+                        {{ isFavoriteMovie(movie.id) ? "❤️" : "+ ♡" }}
                     </button>
                 </div>
                 <div class="col-4">
@@ -230,7 +230,6 @@
     import movieService from "../services/movies";
     import userAvatar from "../assets/user.svg";
     import WatchlistService from "../services/watchlist";
-    import FavoritesService from "../services/favorites"
 
     const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
@@ -286,6 +285,9 @@
         },
         allReviews() {
           return [...this.localReviews, ...(this.movie.reviews || [])];  
+        },
+        isFavoriteMovie() {
+            return (movieId) => this.favoritesStore.isFavorite(movieId);
         },
     },
     methods: {
@@ -385,7 +387,7 @@
             }
 
             try{
-                await FavoritesService.setComment(this.userId, this.movie.id, this.newComment);
+                await this.favoritesStore.setComment(this.userId, this.movie.id, this.newComment);
 
                 const newReview = {
                     id: `local_${Date.now()}`,
@@ -429,7 +431,7 @@
             }
 
             try {
-                await FavoritesService.deleteComment(this.movie.id);
+                await this.favoritesStore.deleteComment(this.movie.id);
 
                 // eliminar review 
                 this.localReviews = this.localReviews.filter(r => !r.id.startsWith('local_'));
@@ -452,7 +454,7 @@
             };
 
             try{
-                await FavoritesService.setRating(this.userId, this.movie.id, parseInt(this.userRating));
+                await this.favoritesStore.setRating(this.userId, this.movie.id, parseInt(this.userRating));
                 alert('Thank you for your rating!');
             } catch (err){
                 console.error('Error submitting rating:', err);
@@ -465,13 +467,13 @@
 
             try {
                 // Cargar rating existente
-                const rating = FavoritesService.getRating(this.movie.id);
+                const rating = this.favoritesStore.getRating(this.movie.id);
                 if (rating !== null) {
                     this.userRating = rating;
                 }
 
                 // Cargar comentario existente
-                const comment = FavoritesService.getComment(this.movie.id);
+                const comment = this.favoritesStore.getComment(this.movie.id);
                 if (comment) {
                 this.existingComment = comment;
       
@@ -561,7 +563,7 @@
     }
 
     .rating-stars-emoji label {
-        font-size: 3rem; 
+        font-size: 2rem; 
         margin: 0 0.1em;
         opacity: 0.3;
         transition: opacity 0.2s;

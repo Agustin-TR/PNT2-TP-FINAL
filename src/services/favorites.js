@@ -19,26 +19,26 @@ class FavoritesService {
 
     if (!user.favorites) user.favorites = []; //Inicializar el array si no existe
 
-    if (user.favorites.some(f => f.movieId === idStr)) {
+    if (user.favorites.some(f => f && f.movieId === idStr)) {
       throw new Error("The movie is already in favorites.");
     }
 
-    // Agregar el favorito
-    /*const newFavorite = {
+    //Agregar el favorito
+    const newFavorite = {
       id: Date.now(), // ID temporal usando timestamp
       userId: user.id,
       movieId: idStr,
-      comment: "",
-      rating: 0,
-      createdAt: new Date().toISOString()
-    };*/
+      //createdAt: new Date().toISOString()
+    };
 
-    //user.favorites.push(newFavorite);
-    user.favorites.push(idStr);
+    user.favorites.push(newFavorite);
+    //user.favorites.push(idStr);
     this._updateUser(authStore, user); //guardar cambios
 
-    return user.favorites;
-
+    return { 
+      message: 'Movie added to favorites',
+      favorite: newFavorite
+    }
   };
 
   deleteFromFavorites = async (favoriteId) => {
@@ -49,7 +49,7 @@ class FavoritesService {
     if (!user.favorites) user.favorites = [];
 
     // Buscar el índice del favorito
-    const index = user.favorites.findIndex(f => f.id === favoriteId);
+    const index = user.favorites.findIndex(f => f && f.id === favoriteId);
 
     if (index === -1){
       throw new Error("Favorite not found.");
@@ -58,7 +58,7 @@ class FavoritesService {
     user.favorites.splice(index, 1); //eliminar del array
 
     this._updateUser(authStore, user); //guardar cambios
-    return user.favorites;
+    return { message: 'Favorite removed successfully' };
   };
 
   isFavorite = (movieId) => {
@@ -66,9 +66,10 @@ class FavoritesService {
     const user = authStore.user;
     
     if (!user) return false;
+    if (!user.favorites || !Array.isArray(user.favorites)) return false;
     
     const idStr = String(movieId);
-    return user.favorites?.some(f => f.movieId === idStr) || false;
+    return user.favorites.some(f => f && f.movieId && f.movieId === idStr) || false;
   };
   
 
@@ -86,7 +87,7 @@ class FavoritesService {
     const idStr = String(movieId);
     if (!user.ratings) user.ratings = [];
     
-    const existingRating = user.ratings.find(r => r.movieId === idStr);
+    const existingRating = user.ratings.find(r => r && r.movieId === idStr);
     if (existingRating) {
       // Actualizar rating existente
       existingRating.rating = rating;
@@ -115,7 +116,7 @@ class FavoritesService {
     if (!user || !user.ratings) return null;
     
     const idStr = String(movieId);
-    const rating = user.ratings.find(r => r.movieId === idStr);
+    const rating = user.ratings.find(r => r && r.movieId === idStr);
     
     return rating ? rating.rating : null;
   }; 
@@ -129,7 +130,7 @@ class FavoritesService {
     if (!user.ratings) user.ratings = [];
     
     const idStr = String(movieId);
-    const index = user.ratings.findIndex(r => r.movieId === idStr);
+    const index = user.ratings.findIndex(r => r && r.movieId === idStr);
     
     if (index === -1) {
       throw new Error('Rating not found.');
@@ -168,7 +169,7 @@ class FavoritesService {
     if (!user.comments) user.comments = [];
     
     // Buscar si ya existe un comentario para esta película
-    const existingComment = user.comments.find(c => c.movieId === idStr);
+    const existingComment = user.comments.find(c => c && c.movieId === idStr);
     
     if (existingComment) {
       // Actualizar comentario existente
@@ -187,7 +188,7 @@ class FavoritesService {
     
     return {
       message: 'Comment saved successfully',
-      comment: user.comments.find(c => c.movieId === idStr)
+      comment: user.comments.find(c => c && c.movieId === idStr)
     };
   };
 
@@ -198,7 +199,7 @@ class FavoritesService {
     if (!user || !user.comments) return null;
     
     const idStr = String(movieId);
-    const comment = user.comments.find(c => c.movieId === idStr);
+    const comment = user.comments.find(c => c && c.movieId === idStr);
     
     return comment ? comment.comment : null;
   };
@@ -212,7 +213,7 @@ class FavoritesService {
     if (!user.comments) user.comments = [];
     
     const idStr = String(movieId);
-    const index = user.comments.findIndex(c => c.movieId === idStr);
+    const index = user.comments.findIndex(c => c && c.movieId === idStr);
     
     if (index === -1) {
       throw new Error('Comment not found.');
