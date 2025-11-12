@@ -1,9 +1,9 @@
 <template>
     <div class="container mt-5">
-        <h2 class="mb-4">⭐ My Favorites</h2>
+        <h2 class="mb-4">❤️ My Favorites</h2>
 
         <div v-if="!isAuthenticated" class="alert alert-danger" role="alert">
-            **Error:** You must be logged in to view your favorites.
+            You must be logged in to view your favorites.
         </div>
 
         <div v-else-if="loading" class="alert alert-info" role="alert">
@@ -112,7 +112,7 @@
 
 <script>
 import { useAuthStore } from "@/stores/authStore";
-import { useFavoritesStore } from "@/stores/favoritesStore"; // ✅ Importar
+import { useFavoritesStore } from "@/stores/favoritesStore"; 
 import movieService from "@/services/movies";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL || 'https://image.tmdb.org/t/p/w200';
@@ -137,7 +137,6 @@ export default {
             return useAuthStore();
         },
         
-        // ✅ NUEVO: Acceso al store de favoritos
         favoritesStore() {
             return useFavoritesStore();
         },
@@ -150,7 +149,6 @@ export default {
             return this.authStore.user ? this.authStore.user.id : null;
         },
 
-        // ✅ Usar favoritos del store en lugar de data local
         favorites() {
             return this.favoritesStore.favorites;
         },
@@ -245,8 +243,8 @@ export default {
             }
             
             try {
-                // ✅ Usar el store para eliminar (esto sincroniza con otros componentes)
-                await this.favoritesStore.toggleFavorite(this.userId, movieId);
+                // Usar el store para eliminar sincroniza con los demás componentes
+                await this.favoritesStore.removeFavorite(movieId);
                 
                 // Actualizar solo los detalles locales (el store ya actualizó favorites)
                 this.favoritesWithDetails = this.favoritesWithDetails.filter(
@@ -256,6 +254,7 @@ export default {
             } catch (err) {
                 this.error = 'Error al eliminar: ' + err.message;
                 console.error(err);
+                alert('Error removing favorite');
             }
         },
 
@@ -320,7 +319,7 @@ export default {
     },
 
     watch: {
-        // ✅ Recargar cuando cambie el userId
+        // Recargar cuando cambie el userId
         userId: {
             immediate: true,
             handler(newId, oldId) {
@@ -332,11 +331,11 @@ export default {
             }
         },
         
-        // ✅ NUEVO: Recargar detalles cuando cambien los favoritos del store
+        // recargar detalles cuando cambien los favoritos del store
         'favoritesStore.favorites': {
-            handler() {
-                // Solo recargar si hay cambios significativos
-                if (this.favorites.length !== this.favoritesWithDetails.length) {
+            handler(newFavorites, oldFavorites) {
+                // Solo recargar si hay cambios
+                if (newFavorites.length !== oldFavorites?.length) {
                     this.loadFavorites();
                 }
             },

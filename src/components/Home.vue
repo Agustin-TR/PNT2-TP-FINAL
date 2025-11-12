@@ -175,6 +175,7 @@ export default {
         //el store llama al servicio internamente
         await this.favoritesStore.toggleFavorite(this.userId, movieId);
       }catch (err){
+        console.error('Error toggling favorites:', err);
         alert(`Could not update favorites: ${err.message}`);
       }
     },
