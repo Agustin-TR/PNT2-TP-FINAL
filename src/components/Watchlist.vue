@@ -1,6 +1,7 @@
 <template>
     <div class="container mt-5">
-        <h2 class="mb-4">📺 My Watchlist {{ counter}}</h2>
+        <h2 v-if="counter > 0" class="mb-4">📺 My Watchlist ({{ counter }})</h2>
+        <h2 v-else class="mb-4">📺 My Watchlist</h2>
 
         <div v-if="!isAuthenticated" class="alert alert-danger" role="alert">
             You must be logged in to view your watchlist.
@@ -335,7 +336,7 @@ export default {
                     this.movieDetails = [];
                 }
             }
-        }
+        },
     }
 };
 </script>

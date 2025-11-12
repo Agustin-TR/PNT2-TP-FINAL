@@ -66,8 +66,8 @@
       <!-- TAB: WATCHLIST -->
       <div v-if="activeTab === 'watchlist'">
         <Spinner v-if="loading" />
-        <Watchlist @counter="updateCounter"/>
-        <ConfirmResetModal :counter="counter" @confirmed="canReset" />
+        <Watchlist ref="watchlist" @counter="updateCounter" />
+        <ConfirmResetModal :counter="counter" @confirmed="confirmed" />
       </div>
 
       <!-- Modal -->
@@ -126,6 +126,7 @@ import authService from "@/services/auth";
 import Spinner from "./Spinner.vue";
 import ConfirmResetModal from "./ConfirmResetModal.vue";
 import Watchlist from "./Watchlist.vue";
+import WatchlistService from "@/services/watchlist";
 
 export default {
   name: "Profile",
@@ -166,6 +167,20 @@ export default {
   methods: {
     updateCounter(newCount) {
         this.counter = newCount;
+    },
+    async confirmed(res) {
+        console.log("🧉 ~ res ➡️ ", res)
+        if (res) {
+            const a = await WatchlistService.resetWatchlist();
+            if(a){
+                await this.reloadComponent();
+            }            
+        }
+    },
+    async reloadComponent() {
+        Object.assign(this.$data, this.$options.data.call(this));
+        await this.loadProfile();
+        this.activeTab = "watchlist";
     },
     setActiveTab(tab) {
       this.activeTab = tab;
@@ -220,6 +235,9 @@ export default {
     },
   },
   mounted() {
+    this.loadProfile();
+  },
+  unmounted() {
     this.loadProfile();
   },
 };

@@ -20,6 +20,7 @@ class WatchlistService {
 
     user.watchlist = [];
     this._updateUser(authStore, user);
+    return true
   };
 
   addToWatchlist = async (movieId) => {
