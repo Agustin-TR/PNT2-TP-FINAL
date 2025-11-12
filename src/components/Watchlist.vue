@@ -1,6 +1,7 @@
 <template>
     <div class="container mt-5">
-        <h2 class="mb-4">📺 My Watchlist</h2>
+        <h2 v-if="counter > 0" class="mb-4">📺 My Watchlist ({{ counter }})</h2>
+        <h2 v-else class="mb-4">📺 My Watchlist</h2>
 
         <div v-if="!isAuthenticated" class="alert alert-danger" role="alert">
             You must be logged in to view your watchlist.
@@ -146,6 +147,7 @@ export default {
             sortDirection: 'desc',
             showModal: false,
             modalPosterUrl: '',
+            counter: 0
         };
     },
     
@@ -192,6 +194,13 @@ export default {
     },
     
     methods: {
+        getCounter() {
+            this.$emit('counter', this.counter)
+        },
+        async getCount() {
+            this.counter = await WatchlistService.getWatchlistCount();
+            this.getCounter();
+        },  
         goToMovie(movieId) {
             this.$router.push(`/movies/${movieId}`);
         },
@@ -250,6 +259,7 @@ export default {
             try {
                 await WatchlistService.removeFromWatchlist(movieId);
                 await this.getWatchlist();
+                this.getCount();
             } catch (err) {
                 alert("Error removing item: " + err.message);
             }
@@ -308,6 +318,7 @@ export default {
     },
     
     async mounted() {
+        this.getCount();
         // Cargar favoritos desde el store
         if (this.userId) {
             await this.favoritesStore.loadFavorites(this.userId);
@@ -325,7 +336,7 @@ export default {
                     this.movieDetails = [];
                 }
             }
-        }
+        },
     }
 };
 </script>

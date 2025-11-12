@@ -7,6 +7,21 @@ class WatchlistService {
     if (!user) throw new Error("User not found.");
     return user.watchlist || [];
   };
+  getWatchlistCount = async () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+    return user.watchlist ? user.watchlist.length : 0;
+  }
+  resetWatchlist = async () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+
+    user.watchlist = [];
+    this._updateUser(authStore, user);
+    return true
+  };
 
   addToWatchlist = async (movieId) => {
     const authStore = useAuthStore();
