@@ -15,7 +15,7 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/signup", component: Signup },
   { path: "/watchlist", component: Watchlist },
-  { path: "/movies/:id", name: "Movie", component: Movie },
+  { path: "/movies/:id", name: "Movie", component: Movie, props: true },
   { path: "/compare", component: Compare },
   { path: "/favorites", component: Favorites },
   { path: "/profile", component: Profile },
