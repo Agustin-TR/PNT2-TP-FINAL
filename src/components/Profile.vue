@@ -69,6 +69,13 @@
         <Watchlist ref="watchlist" @counter="updateCounter" />
         <ConfirmResetModal :counter="counter" @confirmed="confirmed" />
       </div>
+        <!-- TAB: Favorites -->
+      <div v-if="activeTab === 'favorites'">
+        <Spinner v-if="loading" />
+        <button class="btn btn-danger mb-3" disabled @click="resetFavorites">
+          Reset Favorites (Coming Soon)
+        </button>
+      </div>
 
       <!-- Modal -->
       <div
@@ -122,11 +129,13 @@
 <script>
 import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/authStore";
+import { useFavoritesStore } from "@/stores/favoritesStore";
 import authService from "@/services/auth";
 import Spinner from "./Spinner.vue";
 import ConfirmResetModal from "./ConfirmResetModal.vue";
 import Watchlist from "./Watchlist.vue";
 import WatchlistService from "@/services/watchlist";
+
 
 export default {
   name: "Profile",
@@ -134,7 +143,7 @@ export default {
   data() {
     return {
       activeTab: "profile",
-      tabs: ["profile", "watchlist", "favorites", "reviews"],
+      tabs: ["profile", "watchlist", "favorites"],
       editableFields: {
         firstName: "",
         lastName: "",
@@ -145,7 +154,6 @@ export default {
       profile: {},
       watchlist: [],
       favorites: [],
-      reviews: [],
       loading: false,
       saving: false,
       deleting: false,
@@ -160,11 +168,14 @@ export default {
     currentList() {
       if (this.activeTab === "watchlist") return this.watchlist;
       if (this.activeTab === "favorites") return this.favorites;
-      if (this.activeTab === "reviews") return this.reviews;
       return [];
     },
   },
   methods: {
+    resetFavorites() {
+        //useFavoritesStore().clearFavorites();
+        alert("Your favorites have been reset.");
+    },
     updateCounter(newCount) {
         this.counter = newCount;
     },
