@@ -71,7 +71,22 @@ class FavoritesService {
     const idStr = String(movieId);
     return user.favorites.some(f => f && f.movieId && f.movieId === idStr) || false;
   };
-  
+
+  removeAllFavorites = async () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+
+    // Vaciar el array de favoritos
+    user.favorites = [];
+    
+    this._updateUser(authStore, user);
+    
+    return { 
+      message: 'All favorites removed successfully',
+      count: 0
+    };
+  };
 
   // ========== RATINGS  ==========
   setRating = async (userId, movieId, rating) => {

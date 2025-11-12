@@ -79,6 +79,17 @@ export const useFavoritesStore = defineStore("favorites", {
             }
         },
 
+        async removeAllFavorites() {
+            try {
+                await FavoritesService.removeAllFavorites();
+                this.favorites = [];
+                return { message: 'All favorites removed successfully' };
+            } catch (err) {
+                this.error = err.message;
+                throw err;
+            }
+        },
+
         async toggleFavorite(userId, movieId) {
             const isFav = FavoritesService.isFavorite(movieId);
             
