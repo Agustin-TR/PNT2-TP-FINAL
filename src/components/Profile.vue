@@ -63,13 +63,85 @@
             {{ successMessage }}
           </div>
         </form>
+  </div>
+<!-- TAB: FAVORITES -->
+<div v-if="activeTab === 'favorites'">
+  <!-- Título y botón Remove All en la misma línea -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">❤️ My Favorites</h3>
+    
+    <button 
+      v-if="favorites.length > 0"
+      class="btn btn-outline-danger"
+      @click="removeAllFavorites"
+    >
+      <i class="bi bi-trash"></i> Remove All
+    </button>
+  </div>
+  
+  <!-- Spinner mientras carga -->
+  <Spinner v-if="loadingFavorites" />
+  
+  <!-- Mensaje si no hay favoritos -->
+  <div v-else-if="favorites.length === 0" class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    You don't have any favorites yet. Start adding movies!
+  </div>
+  
+  <!-- Grid de películas favoritas -->
+  <div v-else class="row g-3">
+    <div 
+      v-for="movie in favorites" 
+      :key="movie.id"
+      class="col-6 col-md-4 col-lg-3"
+    >
+      <div class="card h-100 shadow-sm">
+        <img 
+          :src="movie.posterUrl" 
+          class="card-img-top" 
+          :alt="movie.title"
+          @click="goToMovie(movie.movieId)"
+          style="cursor: pointer"
+          loading="lazy"
+        />
+        <div class="card-body p-2">
+          <h6 
+            class="card-title mb-1" 
+            style="font-size: 0.9rem; height: 40px; overflow: hidden; cursor: pointer"
+            :title="movie.title"
+            @click="goToMovie(movie.movieId)"
+          >
+            {{ movie.title }}
+          </h6>
+          <p class="card-text small text-muted mb-2">
+            {{ movie.year }} • ⭐ {{ movie.vote_average?.toFixed(1) || 'N/A' }}
+          </p>
+          <button 
+            class="btn btn-sm btn-outline-danger w-100"
+            @click="removeFavorite(movie.movieId)"
+          >
+            <i class="bi bi-trash"></i> Remove
+          </button>
+        </div>
       </div>
-      <!-- TAB: WATCHLIST -->
-      <div v-if="activeTab === 'watchlist'">
-        <Spinner v-if="loading" />
-        <Watchlist ref="watchlist" @counter="updateCounter" />
-        <ConfirmResetModal :counter="counter" @confirmed="confirmed" />
+    </div>
+  </div>
+  
+  <!-- Mensajes de error y éxito -->
+  <div v-if="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+  <div v-if="successMessage" class="alert alert-success mt-3">
+    {{ successMessage }}
+  </div>
+</div>
+
+      <!-- TAB: REVIEWS -->
+      <div v-if="activeTab === 'reviews'">
+        <h3>✍️ My Reviews</h3>
+        <p class="text-muted">Coming soon...</p>
       </div>
+        
 
       <!-- Modal -->
       <div
@@ -117,17 +189,22 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
 import { Modal } from "bootstrap";
 import { useAuthStore } from "@/stores/authStore";
+import { useFavoritesStore } from "@/stores/favoritesStore";
 import authService from "@/services/auth";
+import movieService from "@/services/movies";
 import Spinner from "./Spinner.vue";
 import ConfirmResetModal from "./ConfirmResetModal.vue";
 import Watchlist from "./Watchlist.vue";
 import WatchlistService from "@/services/watchlist";
+
+const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
 export default {
   name: "Profile",
@@ -154,6 +231,8 @@ export default {
       successMessage: "",
       modalInstance: null,
       authStore: useAuthStore(),
+      favoritesStore: useFavoritesStore(), // Instancia del store de favs
+      loadingFavorites: false, //  Loading  para favs    
       counter: 0
     };
   },
@@ -164,6 +243,9 @@ export default {
       if (this.activeTab === "reviews") return this.reviews;
       return [];
     },
+    storeFavorites() {
+      return this.favoritesStore.favorites;
+    }
   },
   methods: {
     updateCounter(newCount) {
@@ -185,6 +267,12 @@ export default {
     },
     setActiveTab(tab) {
       this.activeTab = tab;
+
+      if (tab === 'favorites' && this.favorites.length === 0) {
+        this.loadFavorites();
+      } else if(tab === 'reviews' && this.favorites.length === 0) {
+        this.loadReviews();
+      }
     },
     async loadProfile() {
       this.loading = true;
@@ -211,6 +299,94 @@ export default {
         this.saving = false;
       }
     },
+    async loadFavorites() {
+      this.loadingFavorites = true;
+      this.errorMessage = "";
+    
+      try {
+        // Cargar favoritos desde el store
+        await this.favoritesStore.loadFavorites(this.userId);
+      
+        // Si no hay favoritos, vaciar y salir
+        if (this.storeFavorites.length === 0) {
+          this.favorites = [];
+          return;
+        }
+      
+        // Obtener detalles de cada película
+        const detailsPromises = this.storeFavorites.map(async (fav) => {
+          try {
+            const movieData = await movieService.getMovieDetails(fav.movieId);
+          
+            return {
+              id: fav.id,
+              movieId: fav.movieId,
+              title: movieData.title,
+              year: movieData.release_date?.split('-')[0] || 'N/A',
+              posterUrl: movieData.poster_path 
+                ? `${BASE_IMAGE_URL}${movieData.poster_path}` 
+                : 'https://via.placeholder.com/150x225/333/FFFFFF?text=No+Poster',
+              vote_average: movieData.vote_average,
+              release_date: movieData.release_date,
+              createdAt: fav.createdAt
+            };
+          } catch (err) {
+            console.error(`Error loading movie ${fav.movieId}:`, err);
+            return null;
+          }
+        });
+      
+        const movies = await Promise.allSettled(detailsPromises);
+        this.favorites = movies
+          .filter(r => r.status === 'fulfilled' && r.value)
+          .map(r => r.value);
+        
+      } catch (err) {
+        this.errorMessage = 'Error loading favorites: ' + err.message;
+        console.error(err);
+      } finally {
+        this.loadingFavorites = false;
+      }
+
+    },
+    async removeFavorite(movieId) {
+      if (!confirm('Are you sure you want to remove this movie from favorites?')) {
+        return;
+      }
+    
+      try {
+        await this.favoritesStore.removeFavorite(this.userId, movieId);
+      
+        // Actualizar la lista local
+        this.favorites = this.favorites.filter(f => f.movieId !== String(movieId));
+      
+        this.successMessage = 'Favorite removed successfully!';
+        setTimeout(() => this.successMessage = '', 3000);
+      } catch (err) {
+        this.errorMessage = 'Error removing favorite: ' + err.message;
+        console.error(err);
+      }
+    },
+    async removeAllFavorites(){
+        if (!confirm('Are you sure you want to remove all your movies from favorites?')) {
+        return;
+      }
+
+      try{
+        await this.favoritesStore.removeAllFavorites();
+        this.favorites = [];
+
+        alert('All favorites removed successfully!');
+        setTimeout(() => this.successMessage = '', 3000);
+      } catch (err){
+        this.error = 'Error removing all favorites: ' + err.message;
+        console.error(err);
+      }
+    },
+
+    goToMovie(movieId) {
+      this.$router.push(`/movies/${movieId}`);
+    },    
     openDeleteModal() {
       const modalEl = this.$refs.deleteModal;
       this.modalInstance = new Modal(modalEl);
@@ -237,6 +413,10 @@ export default {
   },
   mounted() {
     this.loadProfile();
+
+    if (this.activeTab === 'favorites' && this.userId) {
+      this.loadFavorites();
+    }
   },
   unmounted() {
     this.loadProfile();

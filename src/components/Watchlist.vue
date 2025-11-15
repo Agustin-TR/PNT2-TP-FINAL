@@ -323,6 +323,8 @@ export default {
         if (this.userId) {
             await this.favoritesStore.loadFavorites(this.userId);
         }
+
+        await this.getWatchlist();
     },
     
     watch: {

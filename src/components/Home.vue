@@ -47,10 +47,11 @@
           <button
             id="btn-favs"
             class="btn btn-sm w-100"
-            :class="isFavorite(movie.id) ? 'btn-success' : 'btn-primary'"
+            :class="isFavoriteMovie(movie.id) ? 'btn-success' : 'btn-primary'"
             @click.stop="toggleFavs(movie.id)"
           >
-            {{ isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+            {{ isFavoriteMovie(movie.id) ? "❤️" : "+ ♡" }}
+
           </button>
 
           <button
@@ -127,6 +128,9 @@ export default {
     isSelectionFull(){
       return this.selectedMovies.length == this.selectionMax
     },
+    isFavoriteMovie() {
+      return (movieId) => this.favoritesStore.isFavorite(movieId);
+    }
   },
   methods: {
     goToWatchlist() {
@@ -161,12 +165,18 @@ export default {
         console.error("Error fetching watchlist:", error);
       }
     },
-    toggleFavs(movieId) {
-      const index = this.favorites.indexOf(movieId);
-      if (index > -1) {
-        this.favorites.splice(index, 1);
-      } else {
-        this.favorites.push(movieId);
+
+    async toggleFavs(movieId) {
+      if (!this.userId) {
+        alert("Please log in to add items to your favorites.");
+        return;
+      }
+      try {
+        //el store llama al servicio internamente
+        await this.favoritesStore.toggleFavorite(this.userId, movieId);
+      }catch (err){
+        console.error('Error toggling favorites:', err);
+        alert(`Could not update favorites: ${err.message}`);
       }
     },
 

@@ -1,114 +1,265 @@
-import {
-  findUser,
-  setFavorite,
-  deleteFavorite,
-  setRatingDB,
-  deleteRatingDB,
-  deleteComment,
-  setComment,
-} from "./db";
+import { useAuthStore } from "@/stores/authStore";
 
 class FavoritesService {
-  getAllFavorites = async (userId) => {
-    // --- Get all favorites
-    const user = findUser(userId);
-    return user.favorites; // Returns the array of favorite objects
+  // ========== FAVORITOS ==========
+  getAllFavorites = async () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+
+    return user.favorites || []; // Returns the array of favorite objects
   };
 
   addToFavorites = async (userId, movieId) => {
-    const user = findUser(userId);
+    const authStore = useAuthStore();
+    const user = authStore.user;
     if (!user) throw new Error("User not found.");
 
     const idStr = String(movieId);
-    if (user.favorites.some((f) => f.movieId === idStr)) {
+
+    if (!user.favorites) user.favorites = []; //Inicializar el array si no existe
+
+    if (user.favorites.some(f => f && f.movieId === idStr)) {
       throw new Error("The movie is already in favorites.");
     }
 
+    //Agregar el favorito
     const newFavorite = {
+      id: Date.now(), // ID temporal usando timestamp
+      userId: user.id,
       movieId: idStr,
+      //createdAt: new Date().toISOString()
     };
 
-    setFavorite(user, newFavorite);
-    return true;
+    user.favorites.push(newFavorite);
+    //user.favorites.push(idStr);
+    this._updateUser(authStore, user); //guardar cambios
+
+    return { 
+      message: 'Movie added to favorites',
+      favorite: newFavorite
+    }
   };
 
-  deleteFromFavorites = async (userId, movieId) => {
-    const user = findUser(userId);
+  deleteFromFavorites = async (favoriteId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
     if (!user) throw new Error("User not found.");
 
-    const idStr = String(movieId);
-    const index = user.favorites.findIndex((f) => f.movieId === idStr);
+    if (!user.favorites) user.favorites = [];
 
-    if (index === -1) throw new Error("Movie not found in favorites.");
+    // Buscar el índice del favorito
+    const index = user.favorites.findIndex(f => f && f.id === favoriteId);
 
-    deleteFavorite(user, index);
-    return true;
-  };
-
-  /*setRating = async (userId, movieId, rating) => {
-    const user = findUser(userId);
-    if (!user) throw new Error("User not found.");
-
-    const favorite = this._getFavoriteById(userId, movieId);
-
-    // Validate rating as a valid integer (e.g. between 0 and 5)
-    if (typeof rating !== "number" || rating < 0 || rating > 5) {
-      throw new Error("Rating must be an integer between 0 and 5.");
+    if (index === -1){
+      throw new Error("Favorite not found.");
     }
 
-    setRatingDB(favorite, rating);
-    return true;
-  };*/
+    user.favorites.splice(index, 1); //eliminar del array
 
-  setRating = async (user, movieId, rating) => {
-    setRatingDB(user, movieId, rating);
-    return true;
+    this._updateUser(authStore, user); //guardar cambios
+    return { message: 'Favorite removed successfully' };
   };
 
-  deleteRating = async (userId, movieId) => {
-    const user = findUser(userId);
-    if (!user) throw new Error("User not found.");
-
-    const favorite = this._getFavoriteById(userId, movieId);
-
-    deleteRatingDB(favorite, rating);
-
-    return true;
-  };
-
-  // --- Find favorite by ID ---
-  /*_getFavoriteById(userId, movieId) {
-    const user = findUser(userId);
+  isFavorite = (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user) return false;
+    if (!user.favorites || !Array.isArray(user.favorites)) return false;
+    
     const idStr = String(movieId);
-    const favorite = user.favorites.find((f) => f.movieId === idStr);
-    if (!favorite) {
-      throw new Error("The movie is not in favorites.");
+    return user.favorites.some(f => f && f.movieId && f.movieId === idStr) || false;
+  };
+
+  removeAllFavorites = async () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+
+    // Vaciar el array de favoritos
+    user.favorites = [];
+    
+    this._updateUser(authStore, user);
+    
+    return { 
+      message: 'All favorites removed successfully',
+      count: 0
+    };
+  };
+
+  // ========== RATINGS  ==========
+  setRating = async (userId, movieId, rating) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    if (!user) throw new Error("User not found.");
+    
+    // Validacion
+    if (typeof rating !== 'number' || rating < 0 || rating > 10) {
+      throw new Error('Rating must be a number between 0 and 10.');
     }
-    return favorite;
-  }*/
+    
+    const idStr = String(movieId);
+    if (!user.ratings) user.ratings = [];
+    
+    const existingRating = user.ratings.find(r => r && r.movieId === idStr);
+    if (existingRating) {
+      // Actualizar rating existente
+      existingRating.rating = rating;
+      existingRating.updatedAt = new Date().toISOString();
+    } else {
+      // Crear nuevo rating
+      user.ratings.push({
+        movieId: idStr,
+        rating: rating,
+        createdAt: new Date().toISOString()
+      });
+    }
 
-  /*setCommentToFavorite = async (userId, movieId, comment) => {
-    const user = findUser(userId);
-    if (!user) throw new Error("User not found.");
+    this._updateUser(authStore, user);
 
-    const favorite = this._getFavorite(user, movieId);
-    setComment(favorite, comment);
-    return true;
-  };*/
-
-  setComment = async (user, movieId, comment) => {
-    setComment(user, movieId, comment);
-    return true;
+    return {
+      message: 'Rating saved successfully',
+      rating: user.ratings.find(r => r.movieId === idStr)
+    };
   };
 
-  deleteCommentFromFavorite = async (userId, movieId) => {
-    const user = findUser(userId);
-    if (!user) throw new Error("User not found.");
+  getRating = (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user || !user.ratings) return null;
+    
+    const idStr = String(movieId);
+    const rating = user.ratings.find(r => r && r.movieId === idStr);
+    
+    return rating ? rating.rating : null;
+  }; 
 
-    const favorite = this._getFavorite(user, movieId);
-    deleteComment(favorite, comment);
-    return true;
+  deleteRating = async (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user) throw new Error("User not found.");
+    
+    if (!user.ratings) user.ratings = [];
+    
+    const idStr = String(movieId);
+    const index = user.ratings.findIndex(r => r && r.movieId === idStr);
+    
+    if (index === -1) {
+      throw new Error('Rating not found.');
+    }
+    
+    user.ratings.splice(index, 1);
+    this._updateUser(authStore, user);
+    
+    return { message: 'Rating deleted successfully' };
   };
+
+  getAllRatings = () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user) return [];
+    
+    return user.ratings || [];
+  }; 
+  
+  // ========== COMMENTS ==========
+  
+  setComment = async (movieId, comment) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user) throw new Error("User not found.");
+    
+    if (!comment || comment.trim() === '') {
+      throw new Error('Comment cannot be empty.');
+    }
+    
+    const idStr = String(movieId);
+    
+    // Inicializar array si no existe
+    if (!user.comments) user.comments = [];
+    
+    // Buscar si ya existe un comentario para esta película
+    const existingComment = user.comments.find(c => c && c.movieId === idStr);
+    
+    if (existingComment) {
+      // Actualizar comentario existente
+      existingComment.comment = comment.trim();
+      existingComment.updatedAt = new Date().toISOString();
+    } else {
+      // Crear nuevo comentario
+      user.comments.push({
+        movieId: idStr,
+        comment: comment.trim(),
+        createdAt: new Date().toISOString(),
+      });
+    }
+    
+    this._updateUser(authStore, user);
+    
+    return {
+      message: 'Comment saved successfully',
+      comment: user.comments.find(c => c && c.movieId === idStr)
+    };
+  };
+
+  getComment = (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user || !user.comments) return null;
+    
+    const idStr = String(movieId);
+    const comment = user.comments.find(c => c && c.movieId === idStr);
+    
+    return comment ? comment.comment : null;
+  };
+
+  deleteComment = async (movieId) => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user) throw new Error("User not found.");
+    
+    if (!user.comments) user.comments = [];
+    
+    const idStr = String(movieId);
+    const index = user.comments.findIndex(c => c && c.movieId === idStr);
+    
+    if (index === -1) {
+      throw new Error('Comment not found.');
+    }
+    
+    user.comments.splice(index, 1);
+    this._updateUser(authStore, user);
+    
+    return { message: 'Comment deleted successfully' };
+  };
+
+  getAllComments = () => {
+    const authStore = useAuthStore();
+    const user = authStore.user;
+    
+    if (!user) return [];
+    
+    return user.comments || [];
+  };
+  
+  // ========== HELPER PRIVADO ==========
+  
+  _updateUser(authStore, user) {
+    authStore.user = user;
+    
+    if (localStorage.getItem("token")) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    }
+  }
 }
 
 export default new FavoritesService();
