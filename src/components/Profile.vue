@@ -6,6 +6,7 @@
         <button
           class="nav-link"
           :class="{ active: activeTab === tab }"
+          :style="{ fontWeight: activeTab === tab ? 'bold' : 'normal' }"
           @click="setActiveTab(tab)"
           type="button"
         >

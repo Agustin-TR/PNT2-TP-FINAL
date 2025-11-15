@@ -42,15 +42,15 @@
     No popular movies found.
   </div>
 
-  <div class="d-flex justify-content-center mt-3 mb-5">
+    <div class="d-flex justify-content-center mt-3 mb-5">
     <button
-      v-if="isAuthenticated"
-      class="btn btn-outline-dark"
-      @click.stop="goToWatchlist"
-    >
-      My Watchlist ✨ ({{ watchlistCount }})
+        v-show="isAuthenticated"
+        class="btn btn-outline-dark"
+        @click.stop="goToWatchlist"
+        >
+        My Watchlist ✨ ({{ watchlistCount }})
     </button>
-  </div>
+</div>
 </template>
 
 <script>
