@@ -5,8 +5,6 @@ const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const PREFIX = URL + "/users";
 
-let nextId = 7;
-
 class AuthService {
   login = async (email, password, rememberMe) => {
     console.log("Trying to log in user with email and password:", {
