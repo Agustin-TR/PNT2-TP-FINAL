@@ -95,10 +95,10 @@
                 <div class="col-4">
                     <button 
                         class="btn btn-sm w-100" 
-                        :class="favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'" 
+                        :class="isFavoriteMovie(movie.id) ? 'btn-success' : 'btn-primary'" 
                         @click.stop="toggleFavs(movie.id)"
                     >
-                        {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
+                        {{ isFavoriteMovie(movie.id) ? "❤️" : "+ ♡" }}
                     </button>
                 </div>
                 <div class="col-4">
@@ -109,7 +109,22 @@
             <hr />
             <section class="container">
                 <h4 class="mb-3">Rate this movie</h4> 
+
+                <p v-if="userRating > 0" class="text-success small mb-2">
+                    ✓ You rated this movie {{ userRating }}/10
+                </p>
+
                 <div class="rating-stars-emoji">
+                    <input type="radio" id="star10" name="rating" value="10" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star10" title="10 stars">⭐</label>                    
+                    <input type="radio" id="star9" name="rating" value="9" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star9" title="9 stars">⭐</label>
+                    <input type="radio" id="star8" name="rating" value="8" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star8" title="8 stars">⭐</label>
+                    <input type="radio" id="star7" name="rating" value="7" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star7" title="7 stars">⭐</label>                    
+                    <input type="radio" id="star6" name="rating" value="6" v-model="userRating" @change="handleRatingSubmit" />
+                    <label for="star6" title="6 stars">⭐</label>
                     <input type="radio" id="star5" name="rating" value="5" v-model="userRating" @change="handleRatingSubmit" />
                     <label for="star5" title="5 stars">⭐</label>
                     <input type="radio" id="star4" name="rating" value="4" v-model="userRating" @change="handleRatingSubmit" />
@@ -119,19 +134,32 @@
                     <input type="radio" id="star2" name="rating" value="2" v-model="userRating" @change="handleRatingSubmit" />
                     <label for="star2" title="2 stars">⭐</label>
                     <input type="radio" id="star1" name="rating" value="1" v-model="userRating" @change="handleRatingSubmit" />
-                    <label for="star1" title="1 star">⭐</label>
+                    <label for="star1" title="1 star">⭐</label>                    
                 </div>
             </section>            
             <hr />
             <section class="container">
                 <h4 class="mb-3">Leave a comment 💬</h4>
+
+                <!-- mostrar comentario existente -->
+                <div v-if="existingComment" class="alert alert-info mb-3">
+                    <strong>Your current comment:</strong>
+                    <p class="mb-2 mt-2">{{ existingComment }}</p>
+                    <button 
+                        class="btn btn-sm btn-outline-danger" 
+                        @click="handleDeleteComment"
+                    >
+                        Delete my comment
+                    </button>
+                </div>
+
                 <form @submit.prevent="handleCommentSubmit">
                     <div class="mb-3">
                         <textarea
                             v-model="newComment"
                             class="form-control"
                             rows="4"
-                            placeholder="Write your review of this movie..."
+                            :placeholder="existingComment ? 'Update your review...' : 'Write your review of this movie...'"
                             required
                         ></textarea>
                     </div>
@@ -202,7 +230,6 @@
     import movieService from "../services/movies";
     import userAvatar from "../assets/user.svg";
     import WatchlistService from "../services/watchlist";
-    import FavoritesService from "../services/favorites"
 
     const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
@@ -226,6 +253,7 @@
         isInWatchlist: false, // <-- FIXED: local state for async check
         userRating: 0,
         newComment: '',
+        existingComment: '',
         };
     },
     computed: {
@@ -257,6 +285,9 @@
         },
         allReviews() {
           return [...this.localReviews, ...(this.movie.reviews || [])];  
+        },
+        isFavoriteMovie() {
+            return (movieId) => this.favoritesStore.isFavorite(movieId);
         },
     },
     methods: {
@@ -331,16 +362,16 @@
                 return;
             }
             try {
-                //el store llama al servicio internamente
                 await this.favoritesStore.toggleFavorite(this.userId, movieId);
             }catch (err){
+                console.error('Error toggling favorites:', err);
                 alert(`Could not update favorites: ${err.message}`);
             }
         },    
         
         async handleCommentSubmit() {
             if (!this.userId) {
-                alert("Please log in to add items to your favorites.");
+                alert("Please log in to leave a comment.");
                 return;
             }
             if (!this.newComment.trim()) {
@@ -349,7 +380,7 @@
             }
 
             try{
-                await FavoritesService.setComment(this.user, this.movie.id, this.newComment);
+                await this.favoritesStore.setComment(this.userId, this.movie.id, this.newComment);
 
                 const newReview = {
                     id: `local_${Date.now()}`,
@@ -362,29 +393,101 @@
                     }
                 };   
 
-                this.localReviews.unshift(newReview);
-                this.newComment = '';
-                alert('Comment added successfully!');
+                // si ya existe un comentario del usuario, reemplazarlo
+                const existingIndex = this.localReviews.findIndex(r => r.id.startsWith('local_'));
+                if (existingIndex !== -1) {
+                    this.localReviews[existingIndex] = newReview;
+                } else {
+                    this.localReviews.unshift(newReview);
+                }   
+                
+                // actualizar el comentario existente
+                this.existingComment = this.newComment.trim();
+                this.newComment = '';  
+                
+                alert(existingIndex !== -1 ? 'Comment updated successfully!' : 'Comment added successfully!');
+
             }catch (err){
                 console.error('Error adding comment:', err);
                 alert('Could not add comment. Please try again.');
             }
         },
 
+        async handleDeleteComment() {
+            if (!this.userId) {
+                alert("Please log in to delete a comment.");
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete your comment?')) {
+                return;
+            }
+
+            try {
+                await this.favoritesStore.deleteComment(this.movie.id);
+
+                // eliminar review 
+                this.localReviews = this.localReviews.filter(r => !r.id.startsWith('local_'));
+                
+                this.existingComment = '';
+                this.newComment = '';
+
+                alert('Comment deleted successfully!');
+            } catch (err) {
+                console.error('Error deleting comment:', err);
+                alert('Could not delete comment. Please try again.');
+            }
+        },        
+
         async handleRatingSubmit() {
             console.log('El usuario puntuó con:', this.userRating, 'estrellas');
             if (!this.userId) {
-                alert("Please log in to add items to your favorites.");
+                alert("Please log in to rate this movie.");
                 return;
             };
 
             try{
-                await FavoritesService.setRating(this.user, this.movie.id, parseInt(this.userRating));
+                await this.favoritesStore.setRating(this.userId, this.movie.id, parseInt(this.userRating));
                 alert('Thank you for your rating!');
             } catch (err){
+                console.error('Error submitting rating:', err);
                 alert(`Could not update your rating: ${err.message}`);
             }
-        }
+        },
+
+        async loadUserRatingAndComment() {
+            if (!this.userId || !this.movie?.id) return;
+
+            try {
+                // Cargar rating existente
+                const rating = this.favoritesStore.getRating(this.movie.id);
+                if (rating !== null) {
+                    this.userRating = rating;
+                }
+
+                // Cargar comentario existente
+                const comment = this.favoritesStore.getComment(this.movie.id);
+                if (comment) {
+                this.existingComment = comment;
+      
+                // Crear review local para mostrar en la lista
+                const localReview = {
+                    id: `local_${this.userId}`,
+                    author: this.authStore.user?.firstName + " " + this.authStore.user?.lastName || 'You',
+                    content: comment,
+                    created_at: new Date().toISOString(),
+                    author_details: {
+                      avatar_path: null,
+                        rating: this.userRating || null
+                    }
+                };
+      
+                this.localReviews = [localReview];
+                }
+            } catch (err) {
+                console.error('Error loading user rating and comment:', err);
+            }
+        }        
     },
     async mounted() {
         await this.fetchMovieDetails();
@@ -400,6 +503,7 @@
 
         if(this.userId){
         await this.favoritesStore.loadFavorites(this.userId);
+        await this.loadUserRatingAndComment();
         }
     },
 };
@@ -452,9 +556,9 @@
     }
 
     .rating-stars-emoji label {
-        font-size: 3rem; /* <-- 1. MÁS GRANDE */
+        font-size: 2rem; 
         margin: 0 0.1em;
-        opacity: 0.3; /* <-- 2. ESTADO "VACÍO" (tenue) */
+        opacity: 0.3;
         transition: opacity 0.2s;
     }
 
