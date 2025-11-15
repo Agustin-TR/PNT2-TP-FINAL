@@ -1,8 +1,6 @@
 <template>
-    <button v-if="counter === 1" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
-    > Reset Movie</button>
-    <button v-else-if="counter > 1" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
-    > Reset Movies</button>
+    <button v-show="counter === 1" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
+    > Reset List</button>
 
     <div>
         <div id="confirmResetModal" class="modal" tabindex="-1">
