@@ -355,7 +355,7 @@ export default {
       }
     
       try {
-        await this.favoritesStore.removeFavorite(this.userId, movieId);
+        await this.favoritesStore.removeFavorite(movieId);
       
         // Actualizar la lista local
         this.favorites = this.favorites.filter(f => f.movieId !== String(movieId));
