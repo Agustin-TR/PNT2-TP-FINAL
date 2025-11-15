@@ -4,8 +4,8 @@ import FavoritesService from "@/services/favorites";
 export const useFavoritesStore = defineStore("favorites", {
     state: () => ({
         favorites: [],
-        ratings: [],     
-        comments: [],   
+        ratings: [],
+        comments: [],
         loading: false,
         error: null
     }),
@@ -15,7 +15,7 @@ export const useFavoritesStore = defineStore("favorites", {
         isFavorite: (state) => (movieId) => {
             return FavoritesService.isFavorite(movieId);
         },
-        
+
         getFavoriteByMovieId: (state) => (movieId) => {
             const movieIdStr = String(movieId);
             return state.favorites.find(f => String(f.movieId) === movieIdStr);
@@ -65,14 +65,18 @@ export const useFavoritesStore = defineStore("favorites", {
             }
         },
 
+
         async removeFavorite(movieId) {
             try {
                 const movieIdStr = String(movieId);
-                const favorite = this.favorites.find(f => f.movieId === movieIdStr);
+                const favorite = this.favorites.find(f => String(f.movieId) === movieIdStr);
+
                 if (!favorite) throw new Error('Favorito no encontrado');
-                
+
                 await FavoritesService.deleteFromFavorites(favorite.id);
+
                 this.favorites = this.favorites.filter(f => f.id !== favorite.id);
+
             } catch (err) {
                 this.error = err.message;
                 throw err;
@@ -92,7 +96,7 @@ export const useFavoritesStore = defineStore("favorites", {
 
         async toggleFavorite(userId, movieId) {
             const isFav = FavoritesService.isFavorite(movieId);
-            
+
             if (isFav) {
                 await this.removeFavorite(movieId);
             } else {
@@ -104,10 +108,10 @@ export const useFavoritesStore = defineStore("favorites", {
         async setRating(userId, movieId, rating) {
             try {
                 const result = await FavoritesService.setRating(userId, movieId, rating);
-                
+
                 // Actualizar estado local
                 this.ratings = FavoritesService.getAllRatings();
-                
+
                 return result;
             } catch (err) {
                 this.error = err.message;
@@ -129,10 +133,10 @@ export const useFavoritesStore = defineStore("favorites", {
         async setComment(userId, movieId, comment) {
             try {
                 const result = await FavoritesService.setComment(userId, movieId, comment);
-                
+
                 // Actualizar estado local
                 this.comments = FavoritesService.getAllComments();
-                
+
                 return result;
             } catch (err) {
                 this.error = err.message;
@@ -148,6 +152,6 @@ export const useFavoritesStore = defineStore("favorites", {
                 this.error = err.message;
                 throw err;
             }
-        },        
+        },
     },
 })
