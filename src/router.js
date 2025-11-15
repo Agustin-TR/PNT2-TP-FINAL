@@ -8,7 +8,7 @@ import Movie from "./components/Movie.vue";
 import Compare from "./components/Compare.vue";
 import Favorites from "./components/Favorites.vue";
 import Profile from "./components/Profile.vue";
-import NotFound from "./components/NotFound.vue";
+import NotFound from "./components/NotFound/index.vue";
 
 const routes = [
   { path: "/", component: Home },
