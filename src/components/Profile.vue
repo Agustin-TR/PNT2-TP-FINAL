@@ -6,6 +6,7 @@
         <button
           class="nav-link"
           :class="{ active: activeTab === tab }"
+          :style="{ fontWeight: activeTab === tab ? 'bold' : 'normal' }"
           @click="setActiveTab(tab)"
           type="button"
         >
@@ -62,8 +63,7 @@
             {{ successMessage }}
           </div>
         </form>
-      </div>
-      <!-- TAB: FAVORITES -->
+  </div>
 <!-- TAB: FAVORITES -->
 <div v-if="activeTab === 'favorites'">
   <!-- Título y botón Remove All en la misma línea -->
@@ -200,12 +200,15 @@ import { useFavoritesStore } from "@/stores/favoritesStore";
 import authService from "@/services/auth";
 import movieService from "@/services/movies";
 import Spinner from "./Spinner.vue";
+import ConfirmResetModal from "./ConfirmResetModal.vue";
+import Watchlist from "./Watchlist.vue";
+import WatchlistService from "@/services/watchlist";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
 
 export default {
   name: "Profile",
-  components: { Spinner },
+  components: { Spinner, ConfirmResetModal, Watchlist },
   data() {
     return {
       activeTab: "profile",
@@ -230,6 +233,7 @@ export default {
       authStore: useAuthStore(),
       favoritesStore: useFavoritesStore(), // Instancia del store de favs
       loadingFavorites: false, //  Loading  para favs    
+      counter: 0
     };
   },
   computed: {
@@ -244,6 +248,23 @@ export default {
     }
   },
   methods: {
+    updateCounter(newCount) {
+        this.counter = newCount;
+    },
+    async confirmed(res) {
+        console.log("🧉 ~ res ➡️ ", res)
+        if (res) {
+            const a = await WatchlistService.resetWatchlist();
+            if(a){
+                await this.reloadComponent();
+            }            
+        }
+    },
+    async reloadComponent() {
+        Object.assign(this.$data, this.$options.data.call(this));
+        await this.loadProfile();
+        this.activeTab = "watchlist";
+    },
     setActiveTab(tab) {
       this.activeTab = tab;
 
@@ -396,6 +417,9 @@ export default {
     if (this.activeTab === 'favorites' && this.userId) {
       this.loadFavorites();
     }
+  },
+  unmounted() {
+    this.loadProfile();
   },
 };
 </script>

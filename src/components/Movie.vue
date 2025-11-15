@@ -295,6 +295,7 @@
             this.loading = true;
             this.error = null;
             const movieId = this.id || this.$route.params.id;
+            console.log("🧉 ~ movieId ➡️ ", movieId)
 
             if (!movieId) {
                 this.error = "Movie ID not provided.";
@@ -330,39 +331,31 @@
             if (path.startsWith("/https")) return path.substring(1);
             return `${BASE_IMAGE_URL}${path}`;
         },
-
         async toggleWatchlist(movieId) {
             const movieIdStr = String(movieId);
-
-            if (!this.userId) {
-                alert("Please log in to add items to your watchlist.");
-                return;
-            }
+            const isCurrentlyAdded = WatchlistService.isInWatchlist(movieIdStr);
 
             try {
-             const currentlyInList = await WatchlistService.isInWatchlist(
-                this.userId,
-                movieIdStr
-                );
+                if (isCurrentlyAdded) {
+                    // Remove from watchlist
+                    const newWatchlist = await WatchlistService.removeFromWatchlist(
+                        movieIdStr
+                    );
 
-                if (currentlyInList) {
-                const newWatchlist = await WatchlistService.removeFromWatchlist(
-                    this.userId,
-                    movieIdStr
-                );
-                this.watchlist = newWatchlist.map(String);
-                this.isInWatchlist = false;
+                    this.watchlist = newWatchlist.map(String);
+                    this.isInWatchlist = false;
                 } else {
-                await WatchlistService.addToWatchlist(this.userId, movieIdStr);
-                this.watchlist.push(movieIdStr);
-                this.isInWatchlist = true;
+                    // Add to watchlist
+                    await WatchlistService.addToWatchlist(movieIdStr);
+                    // Manually update the local state for immediate visual feedback
+                    this.watchlist.push(movieIdStr);
+                    this.isInWatchlist = true;
                 }
             } catch (error) {
                 console.error(`Error toggling watchlist for movie ${movieId}:`, error);
                 alert(`Could not update watchlist: ${error.message}`);
             }
         },
-
         async toggleFavs(movieId) {
             if (!this.userId) {
                 alert("Please log in to add items to your favorites.");

@@ -1,12 +1,9 @@
 import axios from "axios";
-import { getUsers, findUserByEmail, saveUser } from "./db";
 import { validateToken } from "@/utils/user";
 
 const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const PREFIX = URL + "/users";
-
-let nextId = 7;
 
 class AuthService {
   login = async (email, password, rememberMe) => {

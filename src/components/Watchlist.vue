@@ -1,9 +1,10 @@
 <template>
     <div class="container mt-5">
-        <h2 class="mb-4">📺 My Watchlist</h2>
+        <h2 v-if="counter > 0" class="mb-4">📺 My Watchlist ({{ counter }})</h2>
+        <h2 v-else class="mb-4">📺 My Watchlist</h2>
 
         <div v-if="!isAuthenticated" class="alert alert-danger" role="alert">
-            **Error:** You must be logged in to view your watchlist.
+            You must be logged in to view your watchlist.
         </div>
 
         <div v-else-if="isLoading" class="alert alert-info" role="alert">
@@ -80,14 +81,20 @@
                             />
                         </td>
                         <td class="text-center text-nowrap">
-                            <!-- ✅ CORREGIDO: Emoji dentro del botón, no en :class -->
+
                             <button 
                                 @click="toggleFavs(movie.id)" 
-                                :class="['btn', 'btn-sm', 'me-2', favoritesStore.isFavorite(movie.id) ? 'btn-warning' : 'btn-outline-warning']"
+                                :class="[
+                                    'btn', 
+                                    'btn-sm', 
+                                    'me-2', 
+                                    favoritesStore.isFavorite(movie.id) ? 'btn-warning' : 'btn-outline-warning'
+                                ]"
                                 :title="favoritesStore.isFavorite(movie.id) ? 'Remove from Favorites' : 'Add to Favorites'"
-                            >
-                                {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡"}}
+                                >
+                                {{ favoritesStore.isFavorite(movie.id) ? "❤️" : "+ ♡" }}
                             </button>
+
                             <button @click="removeItem(movie.id)" class="btn btn-sm btn-outline-danger" title="Remove from Watchlist">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -140,6 +147,7 @@ export default {
             sortDirection: 'desc',
             showModal: false,
             modalPosterUrl: '',
+            counter: 0
         };
     },
     
@@ -186,6 +194,13 @@ export default {
     },
     
     methods: {
+        getCounter() {
+            this.$emit('counter', this.counter)
+        },
+        async getCount() {
+            this.counter = await WatchlistService.getWatchlistCount();
+            this.getCounter();
+        },  
         goToMovie(movieId) {
             this.$router.push(`/movies/${movieId}`);
         },
@@ -224,13 +239,13 @@ export default {
         },
 
         async toggleFavs(movieId) {
-            if (!this.userId) {
+            if (!this.authStore.isAuthenticated) {
                 alert("You must be logged in to manage favorites.");
                 return;
             }
             
             try {
-                await this.favoritesStore.toggleFavorite(this.userId, movieId);
+                await this.favoritesStore.toggleFavorite(this.authStore.user.id, movieId);
             } catch (err) {
                 alert(`Could not update favorites: ${err.message}`);
             }            
@@ -242,8 +257,9 @@ export default {
             }
             
             try {
-                await WatchlistService.removeFromWatchlist(this.userId, movieId);
+                await WatchlistService.removeFromWatchlist(movieId);
                 await this.getWatchlist();
+                this.getCount();
             } catch (err) {
                 alert("Error removing item: " + err.message);
             }
@@ -302,6 +318,7 @@ export default {
     },
     
     async mounted() {
+        this.getCount();
         // Cargar favoritos desde el store
         if (this.userId) {
             await this.favoritesStore.loadFavorites(this.userId);
@@ -321,7 +338,7 @@ export default {
                     this.movieDetails = [];
                 }
             }
-        }
+        },
     }
 };
 </script>

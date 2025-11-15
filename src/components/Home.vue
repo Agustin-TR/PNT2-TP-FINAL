@@ -1,10 +1,14 @@
 <template>
   <h1 class="mb-4 text-center">Popular this week</h1>
 
-  <button :disabled="!isSelectionFull()"
-  class="btn btn-lg btn-primary mt-3 ms-auto d-block mb-3" @click="goToCompare()"
-  > Compare
-  </button>
+  <div class="d-flex justify-content-end mb-3">
+    <button v-show="isSelectionFull"
+      class="btn btn-lg btn-primary mt-3"
+      @click="goToCompare()"
+    >
+      Compare
+    </button>
+  </div>
 
   <div v-if="loading" class="text-center my-5">
     <div class="spinner-border text-primary" role="status">
@@ -20,7 +24,7 @@
     <div
       v-for="movie in movies"
       :key="movie.id"
-      class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2"
+      class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4"
     >
       <div
         class="card h-100 shadow-sm movie-card clickable"
@@ -34,8 +38,8 @@
           loading="lazy"
         />
 
-        <div class="card-body p-2 text-center">
-          <h6 class="card-title mb-1" style="height: 60px" :title="movie.title">
+        <div class="card-body p-2">
+          <h6 class="card-title mb-1 text-truncate" :title="movie.title">
             {{ movie.title }}
           </h6>
           <p class="card-text small text-muted">{{ movie.year }}</p>
@@ -66,7 +70,6 @@
             type="checkbox"
             :id="'checkbox-' + movie.id"
             v-model="movie.selected"
-            @change="isSelectionFull()"
             :disabled="isCheckboxDisabled(movie)"
             @click.stop
           />
@@ -91,7 +94,6 @@
 import movieService from "../services/movies";
 import WatchlistService from "../services/watchlist";
 import { useAuthStore } from "../stores/authStore";
-import { useFavoritesStore } from "../stores/favoritesStore";
 import { useCompareStore } from "@/stores/compareStore";
 
 const BASE_IMAGE_URL = import.meta.env.VITE_IMG_BASE_URL;
@@ -104,16 +106,14 @@ export default {
       movies: [],
       // watchlist holds movie IDs as strings, matching your service/db
       watchlist: [],
+      favorites: [],
       loading: true,
       error: null,
       authStore: useAuthStore(),
       compareStore: useCompareStore(),
-      selectedMovies: [],
-      selectedCount: 0,
       selectionMax: 3,
     };
   },
-
   computed: {
     watchlistCount() {
       return this.watchlist.length;
@@ -122,28 +122,25 @@ export default {
     userId() {
       return this.authStore.user ? this.authStore.user.id : null;
     },
-    favoritesStore(){
-      return useFavoritesStore();
+    selectedMovies() {
+      return this.movies.filter(m => m.selected);
+    },
+    isSelectionFull(){
+      return this.selectedMovies.length == this.selectionMax
     },
     isFavoriteMovie() {
       return (movieId) => this.favoritesStore.isFavorite(movieId);
     }
   },
-
   methods: {
     goToWatchlist() {
       this.$router.push("/watchlist");
     },
     //checkbox
     isCheckboxDisabled(movie) {
-    this.selectedCount = this.movies.filter(m => m.selected).length;
-    return this.isSelectionFull() && !movie.selected;
-    },
-    isSelectionFull(){
-      return this.selectedCount >= this.selectionMax
+    return this.isSelectionFull && !movie.selected;
     },
     goToCompare(){
-      this.selectedMovies = this.movies.filter(m => m.selected);
       this.compareStore.setSelectedMovies(this.selectedMovies);
       this.$router.push({ path: '/compare' });
     },
@@ -223,6 +220,9 @@ export default {
       // Check for existence using the movie ID cast as a string
       return this.watchlist.includes(String(movieId));
     },
+    isFavorite(movieId) {
+      return this.favorites.includes(movieId);
+    },
     goToDetails(movieId) {
       this.$router.push({ name: "Movie", params: { id: movieId } });
     },
@@ -257,11 +257,6 @@ export default {
     // 2. Fetch the user's watchlist immediately after.
     // This populates the watchlist array and sets the initial state for isAdded().
     await this.getWatchlist();
-
-    //cargar favs una vez
-    if(this.userId){
-      await this.favoritesStore.loadFavorites(this.userId);
-    }
   },
 };
 </script>
