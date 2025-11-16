@@ -1,13 +1,13 @@
 <template>
-    <button v-show="counter > 0" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
-    > Reset List</button>
+    <button v-show="counter > 0" type="button" class="btn btn-outline-danger float-end m-1" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
+    > <i class="bi bi-trash"></i> Remove all</button>
 
     <div>
         <div id="confirmResetModal" class="modal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Read Carefully BeforeD Confirming</h5>
+                        <h5 class="modal-title">Read Carefully Before Confirming</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
