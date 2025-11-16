@@ -125,6 +125,10 @@
             </div>
         </div>
     </div>
+
+     <button class="btn btn-lg btn-outline-primary mt-3 mb-5" @click="$router.go(-1)">
+        ← Back
+    </button>
 </template>
 
 <script>
