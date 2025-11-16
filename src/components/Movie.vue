@@ -221,6 +221,7 @@
 
 <script>
     import { useAuthStore } from "../stores/authStore";
+    import { mapState } from "pinia";
     import { useFavoritesStore } from "../stores/favoritesStore"
     import Spinner from "./Spinner.vue";
     import movieService from "../services/movies";
@@ -256,6 +257,7 @@
         userId() {
         return this.authStore.user ? this.authStore.user.id : null;
         },
+        ...mapState(useAuthStore, ["isAuthenticated", "user"]),
         releaseYear() {
         return this.movie?.release_date
             ? new Date(this.movie.release_date).getFullYear()
@@ -376,7 +378,7 @@
             }
 
             try{
-                await this.favoritesStore.setComment(this.userId, this.movie.id, this.newComment);
+                await this.favoritesStore.setComment(this.movie.id, this.newComment);
 
                 const newReview = {
                     id: `local_${Date.now()}`,
