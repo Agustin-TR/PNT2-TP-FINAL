@@ -19,6 +19,7 @@
 
       <button
         id="btn-favs"
+        v-show="isAuthenticated"
         class="btn btn-sm w-100 mb-2"
         :class="
           favoritesStore.isFavorite(movie.id) ? 'btn-success' : 'btn-primary'

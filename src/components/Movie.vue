@@ -55,9 +55,6 @@
                 <span :class="scoreBadgeClass">
                     {{ movie.vote_average.toFixed(1) }}
                 </span>
-                <small class="text-muted">
-                    /10 ({{ movie.vote_count }} votes)
-                </small>
                 </h4>
 
                 <h5 class="fw-semibold mb-3">
@@ -86,6 +83,7 @@
             <div class="row align-items-center">
                 <div class="col-4">
                     <button
+                        v-show="isAuthenticated"
                         class="btn btn-sm w-100"
                         :class="isInWatchlist ? 'btn-success' : 'btn-primary'"
                         @click.stop="toggleWatchlist(movie.id)"
@@ -94,15 +92,13 @@
                 </div>
                 <div class="col-4">
                     <button 
+                        v-show="isAuthenticated"
                         class="btn btn-sm w-100" 
                         :class="isFavoriteMovie(movie.id) ? 'btn-success' : 'btn-primary'" 
                         @click.stop="toggleFavs(movie.id)"
                     >
                         {{ isFavoriteMovie(movie.id) ? "❤️" : "+ ♡" }}
                     </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-sm w-100 btn-dark">Compare</button>
                 </div>
             </div>
             </section>
