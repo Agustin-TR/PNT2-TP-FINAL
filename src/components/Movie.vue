@@ -102,8 +102,8 @@
                 </div>
             </div>
             </section>
-            <hr />
-            <section class="container">
+            <hr v-show="isAuthenticated"/>
+            <section v-show="isAuthenticated" class="container">
                 <h4 class="mb-3">Rate this movie</h4> 
 
                 <p v-if="userRating > 0" class="text-success small mb-2">
@@ -133,8 +133,8 @@
                     <label for="star1" title="1 star">⭐</label>                    
                 </div>
             </section>            
-            <hr />
-            <section class="container">
+            <hr v-show="isAuthenticated"/>
+            <section v-show="isAuthenticated" class="container">
                 <h4 class="mb-3">Leave a comment 💬</h4>
 
                 <!-- mostrar comentario existente -->
@@ -485,7 +485,35 @@
             } catch (err) {
                 console.error('Error loading user rating and comment:', err);
             }
-        }        
+        },
+        
+    },
+    watch: {
+        '$route.params.id': {
+            immediate: false,
+            async handler(newId) {
+            console.log("🔄 Route changed, loading new movie:", newId);
+
+            this.loading = true;
+            this.error = null;
+
+            await this.fetchMovieDetails();
+            await this.fetchMovieReviews();
+
+            if (this.userId) {
+                this.isInWatchlist = await WatchlistService.isInWatchlist(
+                this.userId,
+                String(this.movie.id)
+                );
+
+                await this.favoritesStore.loadFavorites(this.userId);
+                await this.loadUserRatingAndComment();
+            }
+
+            this.loading = false;
+            }
+    }
+
     },
     async mounted() {
         await this.fetchMovieDetails();
