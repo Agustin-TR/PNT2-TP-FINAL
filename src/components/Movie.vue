@@ -485,7 +485,35 @@
             } catch (err) {
                 console.error('Error loading user rating and comment:', err);
             }
-        }        
+        },
+        
+    },
+    watch: {
+        '$route.params.id': {
+            immediate: false,
+            async handler(newId) {
+            console.log("🔄 Route changed, loading new movie:", newId);
+
+            this.loading = true;
+            this.error = null;
+
+            await this.fetchMovieDetails();
+            await this.fetchMovieReviews();
+
+            if (this.userId) {
+                this.isInWatchlist = await WatchlistService.isInWatchlist(
+                this.userId,
+                String(this.movie.id)
+                );
+
+                await this.favoritesStore.loadFavorites(this.userId);
+                await this.loadUserRatingAndComment();
+            }
+
+            this.loading = false;
+            }
+    }
+
     },
     async mounted() {
         await this.fetchMovieDetails();
