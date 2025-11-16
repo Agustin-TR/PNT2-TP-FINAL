@@ -40,7 +40,7 @@
           </div>
 
           <div
-            class="col-12 d-flex flex-column flex-lg-row gap-2 justify-content-between"
+            class="col-12 d-flex flex-column flex-lg-row gap-2 justify-content-end"
           >
             <button type="submit" class="btn btn-primary" :disabled="saving">
               {{ saving ? "Saving..." : "Save" }}
@@ -63,12 +63,14 @@
             {{ successMessage }}
           </div>
         </form>
+    <button v-show="!loading" class="btn btn-lg btn-outline-primary mt-3 mb-5" @click="$router.go(-1)">← Back </button>
   </div>
       <!-- TAB: WATCHLIST -->
         <div v-if="activeTab === 'watchlist'">
             <Spinner v-if="loading" />
-            <Watchlist ref="watchlist" @counter="updateCounter" />
             <ConfirmResetModal :counter="counter" @confirmed="confirmed" />
+            <Watchlist ref="watchlist" @counter="updateCounter" /> 
+            
         </div>
 
 <!-- TAB: FAVORITES -->
@@ -141,6 +143,7 @@
   <div v-if="successMessage" class="alert alert-success mt-3">
     {{ successMessage }}
   </div>
+    <button class="btn btn-lg btn-outline-primary mt-3 mb-5" @click="$router.go(-1)">← Back </button>
 </div>        
 
       <!-- Modal -->
