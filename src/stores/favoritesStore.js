@@ -130,9 +130,9 @@ export const useFavoritesStore = defineStore("favorites", {
         },
 
         // ========== COMMENTS ==========
-        async setComment(userId, movieId, comment) {
+        async setComment(movieId, comment) {
             try {
-                const result = await FavoritesService.setComment(userId, movieId, comment);
+                const result = await FavoritesService.setComment(movieId, comment);
 
                 // Actualizar estado local
                 this.comments = FavoritesService.getAllComments();

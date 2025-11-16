@@ -64,6 +64,13 @@
           </div>
         </form>
   </div>
+      <!-- TAB: WATCHLIST -->
+        <div v-if="activeTab === 'watchlist'">
+            <Spinner v-if="loading" />
+            <Watchlist ref="watchlist" @counter="updateCounter" />
+            <ConfirmResetModal :counter="counter" @confirmed="confirmed" />
+        </div>
+
 <!-- TAB: FAVORITES -->
 <div v-if="activeTab === 'favorites'">
   <!-- Título y botón Remove All en la misma línea -->
@@ -134,14 +141,7 @@
   <div v-if="successMessage" class="alert alert-success mt-3">
     {{ successMessage }}
   </div>
-</div>
-
-      <!-- TAB: REVIEWS -->
-      <div v-if="activeTab === 'reviews'">
-        <h3>✍️ My Reviews</h3>
-        <p class="text-muted">Coming soon...</p>
-      </div>
-        
+</div>        
 
       <!-- Modal -->
       <div
@@ -212,7 +212,7 @@ export default {
   data() {
     return {
       activeTab: "profile",
-      tabs: ["profile", "watchlist", "favorites", "reviews"],
+      tabs: ["profile", "watchlist", "favorites"],
       editableFields: {
         firstName: "",
         lastName: "",
@@ -223,7 +223,6 @@ export default {
       profile: {},
       watchlist: [],
       favorites: [],
-      reviews: [],
       loading: false,
       saving: false,
       deleting: false,
@@ -240,7 +239,6 @@ export default {
     currentList() {
       if (this.activeTab === "watchlist") return this.watchlist;
       if (this.activeTab === "favorites") return this.favorites;
-      if (this.activeTab === "reviews") return this.reviews;
       return [];
     },
     storeFavorites() {
@@ -270,9 +268,9 @@ export default {
 
       if (tab === 'favorites' && this.favorites.length === 0) {
         this.loadFavorites();
-      } else if(tab === 'reviews' && this.favorites.length === 0) {
-        this.loadReviews();
-      }
+      } else if (tab === "watchlist") {
+        this.loadWatchlist(); 
+    }
     },
     async loadProfile() {
       this.loading = true;
@@ -349,6 +347,12 @@ export default {
       }
 
     },
+    loadWatchlist() {
+  this.activeTab = "watchlist";
+
+  // Si querés forzar que el componente hijo recargue:
+  this.$refs.watchlist?.loadData?.();
+},
     async removeFavorite(movieId) {
       if (!confirm('Are you sure you want to remove this movie from favorites?')) {
         return;

@@ -57,7 +57,7 @@
 <script>
 import movieService from "../services/movies";
 import WatchlistService from "../services/watchlist";
-import { mapState, mapActions } from "pinia";
+import { mapState } from "pinia";
 import { useAuthStore } from "../stores/authStore";
 import { useFavoritesStore } from "../stores/favoritesStore";
 import { useCompareStore } from "@/stores/compareStore";

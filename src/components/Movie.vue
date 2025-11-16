@@ -55,9 +55,6 @@
                 <span :class="scoreBadgeClass">
                     {{ movie.vote_average.toFixed(1) }}
                 </span>
-                <small class="text-muted">
-                    /10 ({{ movie.vote_count }} votes)
-                </small>
                 </h4>
 
                 <h5 class="fw-semibold mb-3">
@@ -86,6 +83,7 @@
             <div class="row align-items-center">
                 <div class="col-4">
                     <button
+                        v-show="isAuthenticated"
                         class="btn btn-sm w-100"
                         :class="isInWatchlist ? 'btn-success' : 'btn-primary'"
                         @click.stop="toggleWatchlist(movie.id)"
@@ -94,15 +92,13 @@
                 </div>
                 <div class="col-4">
                     <button 
+                        v-show="isAuthenticated"
                         class="btn btn-sm w-100" 
                         :class="isFavoriteMovie(movie.id) ? 'btn-success' : 'btn-primary'" 
                         @click.stop="toggleFavs(movie.id)"
                     >
                         {{ isFavoriteMovie(movie.id) ? "❤️" : "+ ♡" }}
                     </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-sm w-100 btn-dark">Compare</button>
                 </div>
             </div>
             </section>
@@ -225,6 +221,7 @@
 
 <script>
     import { useAuthStore } from "../stores/authStore";
+    import { mapState } from "pinia";
     import { useFavoritesStore } from "../stores/favoritesStore"
     import Spinner from "./Spinner.vue";
     import movieService from "../services/movies";
@@ -260,6 +257,7 @@
         userId() {
         return this.authStore.user ? this.authStore.user.id : null;
         },
+        ...mapState(useAuthStore, ["isAuthenticated", "user"]),
         releaseYear() {
         return this.movie?.release_date
             ? new Date(this.movie.release_date).getFullYear()
@@ -380,7 +378,7 @@
             }
 
             try{
-                await this.favoritesStore.setComment(this.userId, this.movie.id, this.newComment);
+                await this.favoritesStore.setComment(this.movie.id, this.newComment);
 
                 const newReview = {
                     id: `local_${Date.now()}`,
