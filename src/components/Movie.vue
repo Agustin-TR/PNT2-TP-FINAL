@@ -102,8 +102,8 @@
                 </div>
             </div>
             </section>
-            <hr />
-            <section class="container">
+            <hr v-show="isAuthenticated"/>
+            <section v-show="isAuthenticated" class="container">
                 <h4 class="mb-3">Rate this movie</h4> 
 
                 <p v-if="userRating > 0" class="text-success small mb-2">
@@ -133,8 +133,8 @@
                     <label for="star1" title="1 star">⭐</label>                    
                 </div>
             </section>            
-            <hr />
-            <section class="container">
+            <hr v-show="isAuthenticated"/>
+            <section v-show="isAuthenticated" class="container">
                 <h4 class="mb-3">Leave a comment 💬</h4>
 
                 <!-- mostrar comentario existente -->
