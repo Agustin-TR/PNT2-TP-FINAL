@@ -11,7 +11,8 @@
         </div>
 
         <div v-else-if="selectedMovies.length" class="d-flex flex-wrap gap-3 justify-content-center flex-grow-1">
-            <div v-for="(movie, index) in selectedMovies" :key="index" class="card shadow-sm movie-card mb-5">
+            <div v-for="(movie, index) in selectedMovies" :key="index" @click="goToDetails(movie.id)"
+    style="cursor: pointer" class="card shadow-sm movie-card mb-5">
                 <img :src="getPosterUrl(movie.poster_path)" class="card-img-top object-fit-cover movie-img"
                     :alt="movie.title" />
                 <div class="card-body">
@@ -87,6 +88,9 @@ export default {
         },
         getYear(date) {
             return date ? new Date(date).getFullYear() : "N/A";
+        },
+        goToDetails(movieId) {
+             this.$router.push({ name: "Movie", params: { id: movieId } });
         },
     },
     mounted() {
