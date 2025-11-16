@@ -213,7 +213,6 @@ export default {
             userRating: 0,
             newComment: '',
             existingComment: '',
-            userRating: 0,
             hoverRating: 0,
         };
     },
@@ -277,7 +276,11 @@ export default {
 
         async fetchMovieReviews() {
             const movieId = this.id || this.$route.params.id;
-            if (!movieId) return;
+            if (!movieId) {
+                this.error = "Movie ID not provided.";
+                this.loading = false;
+                return;
+            }
 
             try {
                 const reviews = await movieService.getMovieReviews(movieId);
@@ -445,31 +448,36 @@ export default {
 
     },
     watch: {
-        '$route.params.id': {
-            immediate: false,
-            async handler(newId) {
-                console.log("🔄 Route changed, loading new movie:", newId);
+    '$route.params.id': {
+        immediate: false,
+        async handler(newId) {
+            console.log("🔄 Route changed, loading new movie:", newId);
 
-                this.loading = true;
-                this.error = null;
+            // 🔥 Reset local state IMMEDIATELY
+            this.movie = { reviews: [] };
+            this.localReviews = [];
+            this.userRating = 0;
+            this.existingComment = '';
+            this.newComment = '';
+            this.hoverRating = 0;
+            this.isInWatchlist = false;
 
-                await this.fetchMovieDetails();
-                await this.fetchMovieReviews();
+            this.loading = true;
+            this.error = null;
 
-                if (this.userId) {
-                    this.isInWatchlist = await WatchlistService.isInWatchlist(
-                        //this.userId,
-                        String(this.movie.id)
-                    );
+            await this.fetchMovieDetails();
+            await this.fetchMovieReviews();
+            await this.loadUserRatingAndComment();
 
-                    await this.favoritesStore.loadFavorites(this.userId);
-                    await this.loadUserRatingAndComment();
+            if (this.userId) {
+                this.isInWatchlist = await WatchlistService.isInWatchlist(String(this.movie.id));
+                await this.favoritesStore.loadFavorites(this.userId);
+                await this.loadUserRatingAndComment();
                 }
 
                 this.loading = false;
             }
         }
-
     },
     async mounted() {
         await this.fetchMovieDetails();
