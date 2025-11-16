@@ -1,5 +1,5 @@
 <template>
-    <button v-show="counter === 1" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
+    <button v-show="counter > 0" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmResetModal"
     > Reset List</button>
 
     <div>

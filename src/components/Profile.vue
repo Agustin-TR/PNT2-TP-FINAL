@@ -64,6 +64,13 @@
           </div>
         </form>
   </div>
+      <!-- TAB: WATCHLIST -->
+        <div v-if="activeTab === 'watchlist'">
+            <Spinner v-if="loading" />
+            <Watchlist ref="watchlist" @counter="updateCounter" />
+            <ConfirmResetModal :counter="counter" @confirmed="confirmed" />
+        </div>
+
 <!-- TAB: FAVORITES -->
 <div v-if="activeTab === 'favorites'">
   <!-- Título y botón Remove All en la misma línea -->

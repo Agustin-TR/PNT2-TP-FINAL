@@ -1,4 +1,4 @@
-import userData from "./users.json";
+/* import userData from "./users.json";
 export const getUsers = () => userData;
 export const findUser = (userId) => userData.find((u) => u.id === userId);
 export const findUserByEmail = (email) =>
@@ -125,3 +125,4 @@ window.setComment = setComment;
 window.deleteComment = deleteComment;
 window.setWatchItem = setWatchItem;
 window.deleteWatchItem = deleteWatchItem;
+ */
