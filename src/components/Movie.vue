@@ -89,7 +89,7 @@
                         ✓ You rated this movie {{ userRating }}/10
                     </p>
 
-                    <div class="rating-stars-emoji">
+<!--                     <div class="rating-stars-emoji">
                         <input type="radio" id="star10" name="rating" value="10" v-model="userRating"
                             @change="handleRatingSubmit" />
                         <label for="star10" title="10 stars">⭐</label>
@@ -120,7 +120,36 @@
                         <input type="radio" id="star1" name="rating" value="1" v-model="userRating"
                             @change="handleRatingSubmit" />
                         <label for="star1" title="1 star">⭐</label>
+                    </div> -->
+
+                    <!--start!test-->
+                    <div class="btn-group rating-stars" @mouseleave="hoverRating = 0">
+                    <template v-for="n in 10">
+                        <input
+                        type="radio"
+                        class="btn-check"
+                        :id="'star' + n"
+                        name="rating"
+                        :value="n"
+                        v-model="userRating"
+                        @change="handleRatingSubmit"
+                        />
+
+                        <label
+                        class="btn star-label"
+                        :for="'star' + n"
+                        :title="`${n} stars`"
+                        @mouseover="hoverRating = n"
+                        :class="{
+                            'active-star': n <= (hoverRating || userRating),
+                            'inactive-star': n > (hoverRating || userRating)
+                        }"
+                        >
+                        ⭐
+                        </label>
+                    </template>
                     </div>
+                    <!--end!test-->
                 </section>
                 <hr v-show="isAuthenticated" />
                 <section v-show="isAuthenticated" class="container">
@@ -219,6 +248,8 @@ export default {
             userRating: 0,
             newComment: '',
             existingComment: '',
+            userRating: 0,
+            hoverRating: 0,
         };
     },
     computed: {
@@ -568,4 +599,27 @@ img {
 .rating-stars-emoji label:hover {
     opacity: 1;
 }
+
+.star-label {
+  padding: 0.3rem 0.45rem;
+  font-size: 1.5rem;
+  border: none;
+  background: transparent;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+/* Highlighted stars */
+.active-star {
+  color: #ffc107; /* yellow */
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Disabled / unfilled stars */
+.inactive-star {
+  color: #ccc;       /* gray-ish */
+  opacity: 0.4;      /* dimmed */
+}
+
 </style>
