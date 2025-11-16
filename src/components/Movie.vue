@@ -88,42 +88,7 @@
                     <p v-if="userRating > 0" class="text-success small mb-2">
                         ✓ You rated this movie {{ userRating }}/10
                     </p>
-
-<!--                     <div class="rating-stars-emoji">
-                        <input type="radio" id="star10" name="rating" value="10" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star10" title="10 stars">⭐</label>
-                        <input type="radio" id="star9" name="rating" value="9" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star9" title="9 stars">⭐</label>
-                        <input type="radio" id="star8" name="rating" value="8" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star8" title="8 stars">⭐</label>
-                        <input type="radio" id="star7" name="rating" value="7" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star7" title="7 stars">⭐</label>
-                        <input type="radio" id="star6" name="rating" value="6" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star6" title="6 stars">⭐</label>
-                        <input type="radio" id="star5" name="rating" value="5" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star5" title="5 stars">⭐</label>
-                        <input type="radio" id="star4" name="rating" value="4" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star4" title="4 stars">⭐</label>
-                        <input type="radio" id="star3" name="rating" value="3" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star3" title="3 stars">⭐</label>
-                        <input type="radio" id="star2" name="rating" value="2" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star2" title="2 stars">⭐</label>
-                        <input type="radio" id="star1" name="rating" value="1" v-model="userRating"
-                            @change="handleRatingSubmit" />
-                        <label for="star1" title="1 star">⭐</label>
-                    </div> -->
-
-                    <!--start!test-->
-                    <div class="btn-group rating-stars" @mouseleave="hoverRating = 0">
+                <div class="btn-group rating-stars" @mouseleave="hoverRating = 0">
                     <template v-for="n in 10">
                         <input
                         type="radio"
@@ -148,8 +113,8 @@
                         ⭐
                         </label>
                     </template>
-                    </div>
-                    <!--end!test-->
+                </div>
+
                 </section>
                 <hr v-show="isAuthenticated" />
                 <section v-show="isAuthenticated" class="container">
