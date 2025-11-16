@@ -13,6 +13,8 @@ dist
 dist-ssr
 coverage
 *.local
+.db.js
+.users.json
 
 .env
 .env.*.local
