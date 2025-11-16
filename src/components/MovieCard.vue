@@ -44,7 +44,7 @@
         type="checkbox"
         :id="'checkbox-' + movie.id"
         v-model="movie.selected"
-        @change="isSelectionFull()"
+        @change="isSelectionFull"
         :disabled="isCheckboxDisabled(movie)"
         @click.stop
       />
