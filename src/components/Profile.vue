@@ -266,7 +266,7 @@ export default {
     setActiveTab(tab) {
       this.activeTab = tab;
 
-      if (tab === 'favorites' && this.favorites.length === 0) {
+      if (tab === 'favorites') {
         this.loadFavorites();
       } else if (tab === "watchlist") {
         this.loadWatchlist(); 
